@@ -38,6 +38,7 @@ import com.bcntransit.app.api.ApiService
 import com.bcntransit.app.data.enums.TransportType
 import com.bcntransit.app.model.FavoriteDto
 import com.bcntransit.app.screens.map.getDrawableIdByName
+import com.bcntransit.app.util.LanguageManager
 import com.bcntransit.app.util.getAndroidId
 import com.example.bcntransit.BCNTransitApp.components.CustomFloatingActionButton
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
@@ -77,6 +78,7 @@ fun RoutesScreen(
     var isFavorite by remember { mutableStateOf(false) }
     var isLoadingFavorite by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val currentLangCode = remember { LanguageManager.getSavedLanguage(context) }
 
     if (selectedStation == null) {
         Box(
@@ -132,9 +134,8 @@ fun RoutesScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
 
                                 Column(
-                                    modifier = Modifier.weight(1f) // ocupa el espacio restante
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    // Nombre de la estación en una sola línea
                                     Text(
                                         text = selectedStation!!.name,
                                         style = MaterialTheme.typography.headlineSmall,
@@ -166,7 +167,6 @@ fun RoutesScreen(
                                     }
                                 }
 
-                                // Botón SIEMPRE al final de la fila
                                 IconButton(
                                     onClick = {
                                         scope.launch {
@@ -253,11 +253,27 @@ fun RoutesScreen(
                                                 .padding(vertical = 4.dp),
                                             colors = CardDefaults.cardColors(containerColor = colorResource(R.color.medium_red))
                                         ) {
+                                            val (header, body) = when (currentLangCode) {
+                                                "ca" -> alert.headerCa to alert.textCa
+                                                "en" -> alert.headerEn to alert.textEn
+                                                else -> alert.headerEs to alert.textEs
+                                            }
                                             Column(modifier = Modifier.padding(8.dp)) {
-                                                Text(alert.headerEs, style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
+                                                Text(
+                                                    text = header,
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    color = Color.White,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+
                                                 Spacer(modifier = Modifier.height(4.dp))
-                                                if (alert.textEs.isNotEmpty()) {
-                                                    Text(alert.textEs, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+
+                                                if (body.isNotEmpty()) {
+                                                    Text(
+                                                        text = body,
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        color = Color.White
+                                                    )
                                                 }
                                             }
                                         }
@@ -268,13 +284,13 @@ fun RoutesScreen(
 
 
                         // RUTAS
-                        item {Row { Text("Llegadas", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }}
+                        item {Row { Text(stringResource(R.string.routes_arrivals), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }}
                         if (routesState.loading && routesState.routes.isEmpty()) {
                             item { CircularProgressIndicator(modifier = Modifier.padding(16.dp), color = colorResource(R.color.medium_red)) }
                         } else if (routesState.error != null) {
                             item { InlineErrorBanner(routesState.error!!) }
                         } else if (routesState.routes.isEmpty()){
-                            item {Text("No hay rutas disponibles.")}
+                            item {Text(stringResource(R.string.routes_not_available))}
                         } else {
                             items(routesState.routes) { route ->
                                 RouteCard(route, routesState.loading)
@@ -288,7 +304,7 @@ fun RoutesScreen(
                         } else if (connectionsState.error != null) {
                             item { InlineErrorBanner(connectionsState.error!!) }
                         } else if (connectionsState.connections.isNotEmpty() && selectedStation!!.transport_type != TransportType.BUS.type) {
-                            item { Row { Text("Enlaces", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) } }
+                            item { Row { Text(stringResource(R.string.routes_connections), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) } }
                             items(connectionsState.connections) { connection ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     val context = LocalContext.current
@@ -328,11 +344,10 @@ fun RoutesScreen(
 
 
                         // LOCATION
-                        item { Row { Text("Ubicación", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 32.dp)) } }
+                        item { Row { Text(stringResource(R.string.location), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 32.dp)) } }
                         item {
                             val station = selectedStation!!
 
-                            // Altura fija para el mini-mapa
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()

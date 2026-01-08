@@ -1,6 +1,5 @@
 package com.example.bcntransit.BCNTransitApp.Screens.settings
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +36,7 @@ fun PrivacyPolicyScreen(
     Scaffold(
         topBar = {
             CustomTopBar(
-                title = { Text(stringResource(R.string.settings_privacy)) }, // Usa tus recursos
+                title = { Text(stringResource(R.string.settings_privacy)) },
                 onBackClick = onBackClick
             )
         }
@@ -61,7 +60,7 @@ fun PrivacyPolicyScreen(
             )
 
             Text(
-                text = "Política de privacidad",
+                text = stringResource(R.string.settings_privacy),
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
@@ -69,13 +68,12 @@ fun PrivacyPolicyScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Badge de fecha
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    text = "Última actualización: 27 oct. 2025",
+                    text = stringResource(R.string.privacy_last_update),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -93,7 +91,7 @@ fun PrivacyPolicyScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "BCNTransit respeta tu privacidad y se compromete a proteger tus datos personales. Esta política describe qué información recopilamos, cómo la usamos y qué derechos tienes.",
+                    text = stringResource(R.string.privacy_intro),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onSurface
@@ -106,59 +104,48 @@ fun PrivacyPolicyScreen(
 
             PolicySection(
                 icon = Icons.Outlined.FolderShared,
-                title = "1. Información que recopilamos",
-                body = """
-                • Identificador del dispositivo (Android ID), usado de forma anónima para mejorar la estabilidad.
-                • Preferencias de configuración (tema oscuro, notificaciones).
-                • Datos agregados de uso (frecuencia, errores).
-                
-                BCNTransit no recopila datos sensibles, ubicaciones en tiempo real ni información de contacto.
-                """.trimIndent()
+                title = stringResource(R.string.privacy_section1_title),
+                body = stringResource(R.string.privacy_section1_body)
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
             PolicySection(
                 icon = Icons.Outlined.CloudSync,
-                title = "2. Uso de la información",
-                body = """
-                Los datos se utilizan exclusivamente para:
-                • Mostrar información del transporte en tiempo real.
-                • Enviar notificaciones de incidencias.
-                • Mejorar el rendimiento de la app.
-                """.trimIndent()
+                title = stringResource(R.string.privacy_section2_title),
+                body = stringResource(R.string.privacy_section2_body)
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
             PolicySection(
                 icon = Icons.Outlined.Announcement,
-                title = "3. Compartición de datos",
-                body = "BCNTransit no comparte ni vende información personal a terceros. Algunos datos técnicos pueden ser procesados por servicios como Firebase Cloud Messaging para notificaciones, bajo sus propias políticas."
+                title = stringResource(R.string.privacy_section3_title),
+                body = stringResource(R.string.privacy_section3_body)
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
             PolicySection(
                 icon = Icons.Outlined.Lock,
-                title = "4. Seguridad",
-                body = "Implementamos medidas técnicas y organizativas para proteger tus datos frente a accesos no autorizados, pérdida o alteración."
+                title = stringResource(R.string.privacy_section4_title),
+                body = stringResource(R.string.privacy_section4_body)
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
             PolicySection(
                 icon = Icons.Outlined.Gavel,
-                title = "5. Tus derechos",
-                body = "Puedes solicitar la eliminación de tus datos locales desinstalando la aplicación. BCNTransit no almacena datos identificables en servidores externos."
+                title = stringResource(R.string.privacy_section5_title),
+                body = stringResource(R.string.privacy_section5_body)
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
             PolicySection(
                 icon = Icons.Outlined.Update,
-                title = "6. Cambios en esta política",
-                body = "Esta política puede actualizarse. Te notificaremos cambios importantes mediante la app o el sitio web oficial."
+                title = stringResource(R.string.privacy_section6_title),
+                body = stringResource(R.string.privacy_section6_body)
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -174,7 +161,6 @@ fun PrivacyPolicyScreen(
     }
 }
 
-// COMPONENTE AUXILIAR PARA SECCIONES LIMPIAS
 @Composable
 private fun PolicySection(
     icon: ImageVector,
@@ -182,14 +168,13 @@ private fun PolicySection(
     body: String
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
-        // Icono lateral alineado al título
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .size(24.dp)
-                .padding(top = 2.dp) // Ajuste visual fino
+                .padding(top = 2.dp)
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -206,11 +191,11 @@ private fun PolicySection(
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    lineHeight = 22.sp, // Mejor lectura
+                    lineHeight = 22.sp,
                     letterSpacing = 0.15.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Start // Justify a veces crea ríos blancos feos en móviles
+                textAlign = TextAlign.Start
             )
         }
     }

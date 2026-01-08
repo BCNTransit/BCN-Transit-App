@@ -78,6 +78,7 @@ fun StationsMap(
                     )
                     style.addSource(lineSource)
 
+
                     val lineLayer = LineLayer("route-layer", "route-source").withProperties(
                         lineColor(lineColor.toArgb()),
                         lineWidth(3f)
@@ -102,7 +103,6 @@ fun StationsMap(
                 }
 
                 // --- GENERACIÓN DE ICONOS ---
-                // El centro es siempre el mismo para ambos casos (32, 32)
                 val center = ICON_SIZE / 2f
 
                 // A) Icono Normal
@@ -168,7 +168,7 @@ fun StationsMap(
                             .withIconImage(iconToUse)
                             .withIconSize(1.0f)
                             .withTextField(station.name)
-                            .withTextOffset(arrayOf(0f, 1.2f)) // Texto debajo estándar
+                            .withTextOffset(arrayOf(0f, 1.2f))
                             .withTextSize(12f)
                             .withTextColor("#000000")
                             .withTextHaloColor("#FFFFFF")

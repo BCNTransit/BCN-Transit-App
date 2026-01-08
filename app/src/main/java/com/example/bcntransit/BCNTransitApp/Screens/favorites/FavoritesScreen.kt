@@ -1,6 +1,5 @@
 package com.bcntransit.app.screens.favorites
 
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
@@ -36,6 +36,10 @@ fun FavoritesScreen(
     var favorites by remember { mutableStateOf<List<FavoriteDto>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+
+    val favoriteDeleted = stringResource(R.string.favorite_deleted)
+    val connectionError = stringResource(R.string.connection_error)
+    val deleteFavoriteError = stringResource(R.string.delete_favorite_error)
 
     LaunchedEffect(currentUserId) {
         loading = true
@@ -65,7 +69,7 @@ fun FavoritesScreen(
                             tint = Color.Unspecified
                         )
                         Text(
-                            text = "Favoritos",
+                            text = stringResource(R.string.favorites),
                             style = MaterialTheme.typography.headlineMedium
                         )
                     }
@@ -92,7 +96,7 @@ fun FavoritesScreen(
                 ) {
                     item {
                         Text(
-                            text = "Aquí encontrarás tus estaciones y líneas favoritas para acceder rápidamente a sus horarios y rutas.",
+                            text = stringResource(R.string.favorites_description),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 16.dp)
@@ -101,7 +105,6 @@ fun FavoritesScreen(
                     }
                     val groupedFavorites = favorites.groupBy { it.TYPE }
                     groupedFavorites.forEach { (type, favoritesOfType) ->
-                        // Header del tipo
                         item {
                             Text(
                                 text = type.replaceFirstChar { it.uppercase() },
@@ -112,7 +115,6 @@ fun FavoritesScreen(
                             )
                         }
 
-                        // Items del tipo
                         itemsIndexed(
                             items = favoritesOfType,
                             key = { _, fav -> "${fav.TYPE}_${fav.STATION_CODE}" }
@@ -134,14 +136,14 @@ fun FavoritesScreen(
                                             if (deleted) {
                                                 favorites = ApiClient.userApiService.getUserFavorites(currentUserId)
                                                 loading = false
-                                                snackbarHostState.showSnackbar("Favorito eliminado")
+                                                snackbarHostState.showSnackbar(favoriteDeleted)
                                             } else {
                                                 loading = false
-                                                snackbarHostState.showSnackbar("Error al eliminar")
+                                                snackbarHostState.showSnackbar(deleteFavoriteError)
                                             }
                                         } catch (e: Exception) {
                                             loading = false
-                                            snackbarHostState.showSnackbar("Error de conexión")
+                                            snackbarHostState.showSnackbar(connectionError)
                                         }
                                     }
                                 }

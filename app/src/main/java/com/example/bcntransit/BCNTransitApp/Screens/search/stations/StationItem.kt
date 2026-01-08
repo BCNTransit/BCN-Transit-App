@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.api.ApiClient
@@ -101,7 +102,7 @@ fun StationItem(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            val alertText = if (station.has_alerts) "Incidencias" else "Servicio normal"
+            val alertText = if (station.has_alerts) stringResource(R.string.incidents) else stringResource(R.string.normal_service)
             val alertColor = if (station.has_alerts) colorResource(R.color.medium_red) else colorResource(R.color.dark_green)
 
             Text(
@@ -119,7 +120,6 @@ fun StationItem(
             }
         }
 
-        // Este IconButton quedará pegado al borde derecho
         IconButton(
             onClick = {
                 scope.launch {

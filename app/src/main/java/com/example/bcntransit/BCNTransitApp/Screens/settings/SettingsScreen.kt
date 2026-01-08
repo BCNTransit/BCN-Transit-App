@@ -24,11 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -61,7 +59,7 @@ fun SettingsScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     val currentLangCode = remember { LanguageManager.getSavedLanguage(context) }
 
-    // Función para copiar el ID al portapapeles (detalle pro)
+    // Función para copiar el ID al portapapeles
     fun copyIdToClipboard() {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Device ID", getAndroidId(context))
@@ -186,7 +184,7 @@ fun SettingsScreen(
                             text = getAndroidId(context),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace // Fuente técnica
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                         )
                     }
                 }
@@ -203,9 +201,6 @@ fun SettingsScreen(
     }
 }
 
-// ------------------------------------------
-// COMPONENTES REUTILIZABLES MEJORADOS
-// ------------------------------------------
 
 @Composable
 fun SettingsSectionHeader(title: String) {
@@ -244,7 +239,7 @@ fun SettingsNavigationItem(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp), // Chevron más sutil
+                modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.outline
             )
         },
@@ -296,7 +291,7 @@ fun LanguageSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.settings_language)) }, // Usar recurso traducido
+        title = { Text(text = stringResource(R.string.settings_language)) },
         text = {
             Column {
                 languages.forEach { (code, name) ->
@@ -323,7 +318,7 @@ fun LanguageSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel)) // Botón estándar de Android
+                Text(stringResource(android.R.string.cancel))
             }
         }
     )
@@ -342,7 +337,7 @@ fun RestartLoadingDialog() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)), // Fondo del tema
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

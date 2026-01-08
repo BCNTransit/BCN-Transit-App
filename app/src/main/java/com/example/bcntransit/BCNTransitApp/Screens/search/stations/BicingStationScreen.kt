@@ -131,7 +131,7 @@ fun BicingStationScreen(
                                         )
 
                                         val isOpen = selectedStation.status == 1
-                                        val alertText = if (isOpen) "En servicio" else "Fuera de servicio"
+                                        val alertText = if (isOpen) stringResource(R.string.bicing_in_service) else stringResource(R.string.bicing_out_of_service)
                                         val alertColor = if (isOpen) colorResource(R.color.dark_green) else colorResource(R.color.red)
 
                                         Box(
@@ -225,7 +225,7 @@ fun BicingStationScreen(
                             ) {
                                 AvailabilityCard(
                                     modifier = Modifier.weight(1f),
-                                    title = "Bicis",
+                                    title = stringResource(R.string.bicing_bikes),
                                     count = selectedStation.bikes,
                                     icon = Icons.Default.DirectionsBike,
                                     color = colorResource(R.color.red)
@@ -234,7 +234,7 @@ fun BicingStationScreen(
                                 // Tarjeta de SLOTS
                                 AvailabilityCard(
                                     modifier = Modifier.weight(1f),
-                                    title = "Anclajes",
+                                    title = stringResource(R.string.bicing_slots),
                                     count = selectedStation.slots,
                                     icon = Icons.Default.LocalParking,
                                     color = MaterialTheme.colorScheme.primary
@@ -242,21 +242,20 @@ fun BicingStationScreen(
                             }
                         }
 
-                        // SECCIÓN 2: Tipos de Bici
                         item {
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("Tipos de Bici Disponibles", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.bicing_available_types), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                                     Spacer(modifier = Modifier.height(12.dp))
 
                                     // Eléctricas
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.Bolt, contentDescription = null, tint = Color(0xFFFFC107)) // Amber
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Eléctricas", modifier = Modifier.weight(1f))
+                                        Text(stringResource(R.string.bicing_electrical), modifier = Modifier.weight(1f))
                                         Text("${selectedStation.electrical_bikes}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                                     }
 
@@ -266,7 +265,7 @@ fun BicingStationScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.PedalBike, contentDescription = null, tint = Color.Gray)
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Mecánicas", modifier = Modifier.weight(1f))
+                                        Text(stringResource(R.string.bicing_mechanical), modifier = Modifier.weight(1f))
                                         Text("${selectedStation.mechanical_bikes}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                                     }
                                 }
@@ -275,7 +274,7 @@ fun BicingStationScreen(
 
                         // SECCIÓN 3: Ubicación (MiniMap)
                         item {
-                            Text("Ubicación", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+                            Text(stringResource(R.string.location), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
                         }
                         item {
                             Box(

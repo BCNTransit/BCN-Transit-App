@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -60,7 +61,7 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                     Icon(painter = painterResource(drawableId), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(38.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
-                        Text("Dirección", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.routes_direction), style = MaterialTheme.typography.labelSmall)
                         Text(if(drawableId == R.drawable.bus) "${route.line_name} - ${route.destination}" else route.destination,
                             style = MaterialTheme.typography.titleLarge)
                     }
@@ -74,7 +75,7 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                     }
                 }
                 else if (route.next_trips.isEmpty()) {
-                    Text("Sin próximos viajes")
+                    Text(stringResource(R.string.routes_not_available))
                 } else {
                     route.next_trips.take(5).forEachIndexed { index, trip ->
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
@@ -123,7 +124,6 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
 
                                 Text(
                                     text = buildAnnotatedString {
-                                        // plannedTime tachado
                                         withStyle(
                                             style = SpanStyle(
                                                 textDecoration = TextDecoration.LineThrough,
@@ -135,7 +135,6 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
 
                                         append(" → ")
 
-                                        // realTime normal
                                         withStyle(
                                             style = SpanStyle(
                                                 color = MaterialTheme.colorScheme.onBackground
@@ -144,7 +143,6 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                                             append(realStr)
                                         }
 
-                                        // delay en color
                                         withStyle(
                                             style = SpanStyle(
                                                 color = delayColor

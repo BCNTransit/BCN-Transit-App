@@ -127,9 +127,6 @@ fun rememberMapViewWithLifecycle(context: Context): MapView {
     return mapView
 }
 
-/**
- * Configura el estilo base del mapa con gestos personalizables
- */
 fun configureMapStyle(
     context: Context,
     map: MapLibreMap,

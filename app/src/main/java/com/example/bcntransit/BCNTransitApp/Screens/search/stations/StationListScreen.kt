@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bcntransit.app.BCNTransitApp.components.InlineErrorBanner
@@ -51,7 +52,7 @@ fun StationListScreen(
     val currentUserId = getAndroidId(LocalContext.current)
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Lista", "Mapa")
+    val tabs = listOf(stringResource(R.string.list), stringResource(R.string.menu_map))
 
     var showAlertsSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -106,7 +107,6 @@ fun StationListScreen(
                                     )
                                 }
                             } else {
-                                // Si no hay alertas, mostramos el icono más sutil
                                 Icon(
                                     imageVector = Icons.Outlined.Info,
                                     contentDescription = "Información del servicio",
@@ -124,7 +124,6 @@ fun StationListScreen(
                     .padding(paddingValues)
                     .background(MaterialTheme.colorScheme.surfaceContainer)
             ) {
-                // AÑADIR DOS TABS: LISTA y MAPA
                 Column {
                     if (line.origin.isNotEmpty() && line.destination.isNotEmpty()) {
                         Row(
@@ -183,7 +182,7 @@ fun StationListScreen(
 
                                     item {
                                         Text(
-                                            text = "Paradas",
+                                            text = stringResource(R.string.stops),
                                             style = MaterialTheme.typography.labelLarge,
                                             color = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.padding(bottom = 8.dp)
@@ -230,7 +229,6 @@ fun StationListScreen(
             }
         }
 
-        // NUEVO: Implementación del BottomSheet de Incidencias
         if (showAlertsSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showAlertsSheet = false },

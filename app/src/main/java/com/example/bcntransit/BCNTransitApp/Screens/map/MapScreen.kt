@@ -1,8 +1,11 @@
 package com.bcntransit.app.screens.map
 
 import SearchTopBar
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -49,16 +52,28 @@ import org.maplibre.android.plugins.annotation.SymbolManager
 import org.maplibre.android.plugins.annotation.SymbolOptions
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.Uri
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.material.icons.filled.PedalBike
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.bcntransit.app.screens.search.AvailabilityCard
 import com.example.bcntransit.BCNTransitApp.components.CustomFloatingActionButton
 import com.example.bcntransit.BCNTransitApp.components.CustomSwitch
+
+import android.provider.Settings
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.LocationOff
+import androidx.compose.material.icons.filled.Settings
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +82,123 @@ fun MapScreen(
     onViewStation: (String, String, String) -> Unit
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    var hasLocationPermission by remember {
+        mutableStateOf(checkLocationPermission(context))
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasLocationPermission = checkLocationPermission(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    if (!hasLocationPermission) {
+        NoLocationPermissionScreen(context)
+    } else {
+        MapContent(
+            onViewLine = onViewLine,
+            onViewStation = onViewStation
+        )
+    }
+}
+
+@Composable
+fun NoLocationPermissionScreen(context: Context) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(120.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOff,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = stringResource(R.string.location_permission_required),
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.location_permission_explanation),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Button(
+                onClick = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                    }
+                    context.startActivity(intent)
+                },
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.open_settings),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MapContent(
+    onViewLine: (String, String) -> Unit,
+    onViewStation: (String, String, String) -> Unit
+) {
+    val context = LocalContext.current
+
     val mapKey = remember { System.currentTimeMillis().toString() }
     val viewModel: MapViewModel = viewModel(
         key = mapKey,
@@ -104,6 +236,8 @@ fun MapScreen(
     var isSearchActive by remember { mutableStateOf(false) }
 
     var initialUserZoomDone by remember { mutableStateOf(false) }
+
+    val bicingTemplate = stringResource(R.string.bicing_station_info)
 
     LaunchedEffect(userLocation) {
         if (!initialUserZoomDone && userLocation != null) {
@@ -282,7 +416,7 @@ fun MapScreen(
                             val elec = station.electrical ?: 0
                             val mech = station.mechanical ?: 0
                             val slots = station.slots ?: 0
-                            val displayText = "Anclajes: $slots\nB. Eléctricas: $elec \nB. Mecánicas: $mech"
+                            val displayText = bicingTemplate.format(slots, elec, mech)
 
                             if (existing == null) {
                                 val iconName = "bicing-icon"
@@ -566,6 +700,7 @@ fun MapScreen(
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterPanel(
@@ -597,7 +732,6 @@ fun FilterPanel(
     ModalDrawerSheet {
         Column(modifier = Modifier.fillMaxHeight()) {
 
-            // --- Header ---
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -605,12 +739,11 @@ fun FilterPanel(
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 Text(
-                    text = "Filtros extra",
+                    text = stringResource(R.string.map_extra_filters),
                     style = MaterialTheme.typography.titleLarge
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {
-                    // Reiniciar valores locales al cerrar sin aplicar
                     localDistance = currentDistance
                     localOnlyElectricalBikes = currentOnlyElectricalBikes
                     localOnlyMechanicalBikes = currentOnlyMechanical
@@ -674,7 +807,7 @@ fun FilterPanel(
                             MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     )
                 ) {
-                    Text("Aplicar")
+                    Text(stringResource(R.string.apply))
                 }
             }
         }
@@ -726,7 +859,7 @@ fun BicingAvailabilityFilters(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Solo paradas con slots libres", modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.bicing_filter_1), modifier = Modifier.weight(1f))
             CustomSwitch(
                 checked = localSlots,
                 onCheckedChange = {
@@ -742,7 +875,7 @@ fun BicingAvailabilityFilters(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Solo paradas con bicis disponibles", modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.bicing_filter_2), modifier = Modifier.weight(1f))
             CustomSwitch(
                 checked = localBikeFilter != "none",
                 onCheckedChange = { checked ->
@@ -762,9 +895,9 @@ fun BicingAvailabilityFilters(
         if (localBikeFilter != "none") {
             Spacer(modifier = Modifier.height(8.dp))
             val options = listOf(
-                "any" to "Cualquier tipo",
-                "electrical" to "Con eléctricas",
-                "mechanical" to "Con mecánicas"
+                "any" to stringResource(R.string.any_type),
+                "electrical" to stringResource(R.string.bicing_electrical_type),
+                "mechanical" to stringResource(R.string.bicing_mechanical_type)
             )
 
             Column(
@@ -807,11 +940,11 @@ fun DistanceSlider(
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            text = "Resultados",
+            text = stringResource(R.string.results),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        Text(text = "Distancia máxima desde ubicación actual:", style = MaterialTheme.typography.bodyMedium)
+        Text(text = stringResource(R.string.max_distance), style = MaterialTheme.typography.bodyMedium)
 
         Slider(
             value = sliderPosition,
@@ -915,7 +1048,7 @@ private fun BottomSheetContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp) // Más espacio entre secciones
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -923,7 +1056,7 @@ private fun BottomSheetContent(
                         ) {
                             AvailabilityCard(
                                 modifier = Modifier.weight(1f),
-                                title = "Bicis",
+                                title = stringResource(R.string.bicing_bikes),
                                 count = bikes,
                                 icon = Icons.Default.DirectionsBike,
                                 color = colorResource(R.color.red)
@@ -931,7 +1064,7 @@ private fun BottomSheetContent(
 
                             AvailabilityCard(
                                 modifier = Modifier.weight(1f),
-                                title = "Anclajes",
+                                title = stringResource(R.string.bicing_slots),
                                 count = slots,
                                 icon = Icons.Default.LocalParking,
                                 color = MaterialTheme.colorScheme.primary
@@ -944,28 +1077,26 @@ private fun BottomSheetContent(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    "Detalle de bicis",
+                                    stringResource(R.string.bicing_bike_detail),
                                     style = MaterialTheme.typography.labelLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                // Eléctricas
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Default.Bolt, contentDescription = null, tint = Color(0xFFFFC107)) // Amber
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Eléctricas", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                                    Text(stringResource(R.string.bicing_electrical), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                                     Text("$electrical", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                                 }
 
                                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth())
 
-                                // Mecánicas
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Default.PedalBike, contentDescription = null, tint = Color.Gray)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Mecánicas", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                                    Text(stringResource(R.string.bicing_mechanical), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                                     Text("$mechanical", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                                 }
                             }
@@ -1018,7 +1149,7 @@ private fun BottomSheetContent(
 
                                 if (listaFinal.isNotEmpty()) {
                                     Text(
-                                        text = "Líneas:",
+                                        text = stringResource(R.string.menu_lines) + ":",
                                         style = MaterialTheme.typography.titleMedium
                                     )
                                     for (connection in listaFinal) {
@@ -1083,14 +1214,12 @@ private fun BottomSheetContent(
 
                                     Spacer(modifier = Modifier.height(12.dp))
 
-                                    // --- Conexiones agrupadas por transport_type ---
                                     if (!conexiones.isNullOrEmpty()) {
                                         Text(
-                                            text = "Conexiones:",
+                                            text = stringResource(R.string.connections),
                                             style = MaterialTheme.typography.titleMedium
                                         )
 
-                                        // Agrupar por tipo de transporte
                                         val grouped =
                                             conexiones.groupBy { it.transport_type.uppercase() }
 
@@ -1213,4 +1342,15 @@ fun getBitmapFromDrawable(context: Context, drawableId: Int, sizePx: Int): Bitma
     drawable.setBounds(0, 0, sizePx, sizePx)
     drawable.draw(canvas)
     return bitmap
+}
+
+fun checkLocationPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 }

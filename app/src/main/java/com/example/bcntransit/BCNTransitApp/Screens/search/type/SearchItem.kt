@@ -55,7 +55,6 @@ fun SearchItem(
                 )
             }
 
-            // Flecha de navegación con icono Material
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = "Navegar",

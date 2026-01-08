@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.model.FavoriteDto
@@ -49,8 +50,8 @@ fun FavoriteItem(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Eliminar favorito") },
-            text = { Text("¿Seguro que deseas eliminar este favorito?") },
+            title = { Text(stringResource(R.string.delete_favorite)) },
+            text = { Text(stringResource(R.string.delete_favorite_body)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -59,7 +60,7 @@ fun FavoriteItem(
                     }
                 ) {
                     Text(
-                        "Eliminar",
+                        stringResource(R.string.delete),
                         color = MaterialTheme.colorScheme.error,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -68,7 +69,7 @@ fun FavoriteItem(
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -128,7 +129,6 @@ fun FavoriteItem(
                     )
                 }
 
-                // Botón de eliminar (estrella)
                 IconButton(
                     onClick = { showDialog = true }
                 ) {

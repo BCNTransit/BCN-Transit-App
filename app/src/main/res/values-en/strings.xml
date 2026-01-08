@@ -63,4 +63,78 @@
     <string name="normal_service">Normal service</string>
     <string name="see_details">See details</string>
     <string name="availability">Availability</string>
+    <string name="delete_favorite">Delete favorite</string>
+    <string name="delete_favorite_body">Are you sure you want to delete this favorite?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="favorites">Favorites</string>
+    <string name="favorites_description">Here you will find your favorite stations and lines for quick access to their schedules and routes.</string>
+    <string name="favorite_deleted">Favorite deleted</string>
+    <string name="bicing_station_info">Slots: %1$d\nE-Bikes: %2$d\nMech. Bikes: %3$d</string>
+    <string name="connection_error">Connection error</string>
+    <string name="delete_favorite_error">Error deleting favorite</string>
+    <string name="map_extra_filters">Extra filters</string>
+    <string name="apply">Apply</string>
+    <string name="bicing_filter_1">Only stations with available slots</string>
+    <string name="bicing_filter_2">Only stations with available bikes</string>
+    <string name="any_type">Any type</string>
+    <string name="bicing_electrical_type">With E-bikes</string>
+    <string name="bicing_mechanical_type">With mechanical bikes</string>
+    <string name="results">Results</string>
+    <string name="max_distance">Maximum distance from current location:</string>
+    <string name="bicing_bikes">Bikes</string>
+    <string name="bicing_slots">Slots</string>
+    <string name="bicing_electrical">E-bikes</string>
+    <string name="bicing_mechanical">Mechanical</string>
+    <string name="bicing_bike_detail">Bikes detail</string>
+    <string name="lines">Lines</string>
+    <string name="connections">Connections</string>
+    <string name="incident">Incident</string>
+    <string name="alert">Alert</string>
+    <string name="alert_affects">Affects:</string>
+    <string name="alert_start_date">Starts: %1$s</string>
+    <string name="date">Date:</string>
+    <string name="alert_without_cause">Incident without detailed description.</string>
+    <string name="alert_service_status">Service status:</string>
+    <string name="alerts_no_incidents">No incidents reported</string>
+    <string name="bicing_available_types">Available Bike Types</string>
+    <string name="location">Location</string>
+    <string name="bicing_in_service">In service</string>
+    <string name="bicing_out_of_service">Out of service</string>
+    <string name="stops">Stops</string>
+    <string name="list">List</string>
+    <string name="routes_arrivals">Next</string>
+    <string name="routes_connections">Connections</string>
+    <string name="routes_not_available">No available routes.</string>
+    <string name="routes_direction">Direction</string>
+    <string name="privacy_last_update">Last Update: January 2026</string>
+    <string name="privacy_intro">BCNTransit respects your privacy and is committed to protecting your personal data. This policy describes what information we collect, how we use it, and what rights you have.</string>
+    <string name="privacy_section1_title">1. Information we collect</string>
+    <string name="privacy_section1_body">
+    • Device identifier (Android ID), used anonymously to improve stability.\n
+    • Configuration preferences (dark mode, notifications).\n
+    • Aggregated usage data (frequency, errors).\n\n
+    BCNTransit does not collect sensitive data, real-time location, or contact information.
+</string>
+    <string name="privacy_section2_title">2. Use of information</string>
+    <string name="privacy_section2_body">
+    Data is used exclusively to:\n
+    • Display real-time transport information.\n
+    • Send incident notifications.\n
+    • Improve app performance.
+</string>
+    <string name="privacy_section3_title">3. Data sharing</string>
+    <string name="privacy_section3_body">BCNTransit does not share or sell personal information to third parties. Some technical data may be processed by services like Firebase Cloud Messaging for notifications, under their own policies.</string>
+
+    <string name="privacy_section4_title">4. Security</string>
+    <string name="privacy_section4_body">We implement technical and organizational measures to protect your data against unauthorized access, loss, or alteration.</string>
+
+    <string name="privacy_section5_title">5. Your rights</string>
+    <string name="privacy_section5_body">You can request the deletion of your local data by uninstalling the application. BCNTransit does not store identifiable data on external servers.</string>
+
+    <string name="privacy_section6_title">6. Changes to this policy</string>
+    <string name="privacy_section6_body">This policy may be updated. We will notify you of significant changes via the app or the official website.</string>
+    <string name="location_permission_required">Location permission required</string>
+    <string name="location_permission_explanation">To show nearby stops and your position on the map, we need access to your location.</string>
+    <string name="open_settings">Open Configuration</string>
 </resources>

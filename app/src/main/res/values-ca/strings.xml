@@ -62,4 +62,78 @@
     <string name="normal_service">Servei normal</string>
     <string name="see_details">Veure detalls</string>
     <string name="availability">Disponibilitat</string>
+    <string name="delete_favorite">Eliminar preferit</string>
+    <string name="delete_favorite_body">Segur que vols eliminar aquest preferit?</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancel·lar</string>
+    <string name="favorites">Preferits</string>
+    <string name="favorites_description">Aquí trobaràs les teves estacions i línies preferides per accedir ràpidament als seus horaris i rutes.</string>
+    <string name="favorite_deleted">Preferit eliminat</string>
+    <string name="bicing_station_info">Places: %1$d\nB. Elèctriques: %2$d\nB. Mecàniques: %3$d</string>
+    <string name="connection_error">Error de conexió</string>
+    <string name="delete_favorite_error">Error eliminant preferit</string>
+    <string name="map_extra_filters">Filtres extra</string>
+    <string name="apply">Aplicar</string>
+    <string name="bicing_filter_1">Només parades amb places lliures</string>
+    <string name="bicing_filter_2">Només parades amb bicis disponibles</string>
+    <string name="any_type">Qualsevol tipus</string>
+    <string name="bicing_electrical_type">Amb bicis elèctriques</string>
+    <string name="bicing_mechanical_type">Amb bicis mecàniques</string>
+    <string name="results">Resultats</string>
+    <string name="max_distance">Distància màxima des de l\'ubicació actual:</string>
+    <string name="bicing_bikes">Bicis</string>
+    <string name="bicing_slots">Places</string>
+    <string name="bicing_electrical">Elèctriques</string>
+    <string name="bicing_mechanical">Mecàniques</string>
+    <string name="bicing_bike_detail">Detall de bicis</string>
+    <string name="lines">Línies</string>
+    <string name="connections">Conexions</string>
+    <string name="incident">Incidència</string>
+    <string name="alert">Alerta</string>
+    <string name="alert_affects">Afecta a:</string>
+    <string name="alert_start_date">Inici: %1$s</string>
+    <string name="date">Data:</string>
+    <string name="alert_without_cause">Incidència sense descripció detallada.</string>
+    <string name="alert_service_status">Estat del servei:</string>
+    <string name="alerts_no_incidents">No hi ha incidències reportades.</string>
+    <string name="bicing_available_types">Tipus de Bici Disponibles</string>
+    <string name="location">Ubicació</string>
+    <string name="bicing_in_service">En servei</string>
+    <string name="bicing_out_of_service">Fora de servei</string>
+    <string name="stops">Parades</string>
+    <string name="list">Llista</string>
+    <string name="routes_arrivals">Propers</string>
+    <string name="routes_connections">Enllaços</string>
+    <string name="routes_not_available">No hi ha rutes disponibles.</string>
+    <string name="routes_direction">Direcció</string>
+    <string name="privacy_last_update">Darrera actualizació: Gener 2026</string>
+    <string name="privacy_intro">BCNTransit respecta la teva privadesa i es compromet a protegir les teves dades personals. Aquesta política descriu quina informació recopilem, com l\'utilitzem i quins drets tens.</string>
+    <string name="privacy_section1_title">1. Informació que recopilem</string>
+    <string name="privacy_section1_body">
+    • Identificador del dispositiu (Android ID), utilitzat de manera anònima per millorar l\'estabilitat.\n
+    • Preferències de configuració (tema fosc, notificacions).\n
+    • Dades agregades d\'ús (freqüència, errors).\n\n
+    BCNTransit no recopila dades sensibles, ubicacions en temps real ni informació de contacte.
+</string>
+    <string name="privacy_section2_title">2. Ús de la informació</string>
+    <string name="privacy_section2_body">
+    Les dades s\'utilitzen exclusivament per a:\n
+    • Mostrar informació del transport en temps real.\n
+    • Enviar notificacions d\'incidències.\n
+    • Millorar el rendiment de l\'app.
+</string>
+    <string name="privacy_section3_title">3. Compartició de dades</string>
+    <string name="privacy_section3_body">BCNTransit no comparteix ni ven informació personal a tercers. Algunes dades tècniques poden ser processades per serveis com Firebase Cloud Messaging per a notificacions, sota les seves pròpies polítiques.</string>
+
+    <string name="privacy_section4_title">4. Seguretat</string>
+    <string name="privacy_section4_body">Implementem mesures tècniques i organitzatives per protegir les teves dades davant d\'accessos no autoritzats, pèrdua o alteració.</string>
+
+    <string name="privacy_section5_title">5. Els teus drets</string>
+    <string name="privacy_section5_body">Pots sol·licitar l\'eliminació de les teves dades locals desinstal·lant l\'aplicació. BCNTransit no emmagatzema dades identificables en servidors externs.</string>
+
+    <string name="privacy_section6_title">6. Canvis en aquesta política</string>
+    <string name="privacy_section6_body">Aquesta política es pot actualitzar. Et notificarem canvis importants mitjançant l\'app o el lloc web oficial.</string>
+    <string name="location_permission_required">Permis d\'ubicació requerit</string>
+    <string name="location_permission_explanation">Per mostrar-te les parades properes i la teva posició al mapa, necessitem accés a la teva ubicació.</string>
+    <string name="open_settings">Obrir Configuració</string>
 </resources>

@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.model.transport.AlertDto
 import com.example.bcntransit.BCNTransitApp.Screens.search.alerts.AlertCard
+import com.bcntransit.app.R
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -27,7 +29,7 @@ fun AlertsContent(
             .padding(bottom = 48.dp)
     ) {
         Text(
-            text = "Estado del servicio:",
+            text = stringResource(R.string.alert_service_status),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -35,7 +37,6 @@ fun AlertsContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (alerts.isEmpty()) {
-            // --- SERVICIO NORMAL ---
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -50,17 +51,16 @@ fun AlertsContent(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Servicio normal",
+                    text = stringResource(R.string.normal_service),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "No hay incidencias reportadas.",
+                    text = stringResource(R.string.alerts_no_incidents),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } else {
-            // --- LISTA DE INCIDENCIAS ---
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(bottom = 24.dp)
