@@ -31,7 +31,6 @@
     import com.bcntransit.app.BCNTransitApp.Screens.navigation.Screen.Favorites.typeParam
     import com.bcntransit.app.BCNTransitApp.Screens.navigation.Screen.Favorites.lineCodeParam
     import com.bcntransit.app.BCNTransitApp.Screens.navigation.Screen.Favorites.stationCodeParam
-    import com.bcntransit.app.screens.PlaceholderScreen
     import com.bcntransit.app.screens.search.BicingStationScreen
     import com.bcntransit.app.screens.search.StationListScreen
     import com.bcntransit.app.screens.settings.SettingsScreen
@@ -48,11 +47,9 @@
         val registerViewModel: RegisterViewModel = viewModel()
         val currentUserId = getAndroidId(LocalContext.current)
 
-        // Observa el destino actual del NavHost
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
-        // Deriva el BottomTab actual a partir de la ruta
         val currentBottomTab = when (currentRoute) {
             Screen.Map.route -> BottomTab.MAP
             Screen.Search.route -> BottomTab.SEARCH

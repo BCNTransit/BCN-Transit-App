@@ -17,10 +17,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -61,13 +61,11 @@ fun BicingStationScreen(
     val loading by viewModel.loading.collectAsState()
 
     var showFullMap by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var isFavorite by remember { mutableStateOf(false) }
     var isLoadingFavorite by remember { mutableStateOf(false) }
 
-    // Check Favorito inicial
     LaunchedEffect(station, currentUserId) {
         if (station != null) {
             try {
@@ -97,7 +95,7 @@ fun BicingStationScreen(
                 transportType = TransportType.BICING.type,
                 latitude = selectedStation.latitude,
                 longitude = selectedStation.longitude,
-                accesses = emptyList(), // Bicing no suele tener info de ascensores
+                accesses = emptyList(),
                 onDismiss = { showFullMap = false }
             )
         } else {
@@ -109,9 +107,8 @@ fun BicingStationScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(vertical = 16.dp)
                             ) {
-                                // Icono Bicing
                                 Icon(
-                                    painter = painterResource(R.drawable.bicing), // Asegúrate de tener este recurso
+                                    painter = painterResource(R.drawable.bicing),
                                     contentDescription = null,
                                     tint = Color.Unspecified,
                                     modifier = Modifier.size(50.dp)
@@ -119,7 +116,6 @@ fun BicingStationScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
 
                                 Column(modifier = Modifier.weight(1f)) {
-                                    // Nombre (Calle + Número)
                                     Text(
                                         text = "${selectedStation.streetName}, ${selectedStation.streetNumber}",
                                         style = MaterialTheme.typography.headlineSmall,
@@ -127,7 +123,6 @@ fun BicingStationScreen(
                                         overflow = TextOverflow.Ellipsis
                                     )
 
-                                    // Subtítulo con estado
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
                                             text = "(${selectedStation.id})  ·  ",
@@ -153,7 +148,6 @@ fun BicingStationScreen(
                                     }
                                 }
 
-                                // Botón Favorito
                                 IconButton(
                                     onClick = {
                                         scope.launch {
@@ -220,9 +214,8 @@ fun BicingStationScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
 
-                        // SECCIÓN 1: Disponibilidad General
                         item {
-                            Text("Disponibilidad", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.availability), style = MaterialTheme.typography.titleMedium)
                         }
 
                         item {
@@ -230,7 +223,6 @@ fun BicingStationScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                // Tarjeta de BICIS
                                 AvailabilityCard(
                                     modifier = Modifier.weight(1f),
                                     title = "Bicis",

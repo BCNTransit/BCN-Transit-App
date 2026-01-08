@@ -1,14 +1,10 @@
 package com.bcntransit.app.screens.search
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.*
@@ -19,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -48,7 +45,6 @@ fun BusLinesScreen(
     val context = LocalContext.current
 
     Scaffold(
-        // Usamos surface normal para que se funda con la lista
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             CustomTopBar(
@@ -73,7 +69,7 @@ fun BusLinesScreen(
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "Líneas de Bus",
+                            stringResource(R.string.bus_lines),
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
@@ -106,7 +102,6 @@ fun BusLinesScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         groupedByCategory.forEach { (category, linesInCategory) ->
-                            // 1. Cabecera de Categoría (Estilo Flat)
                             item {
                                 CategoryHeaderFlat(
                                     title = category,
@@ -116,7 +111,6 @@ fun BusLinesScreen(
                                 )
                             }
 
-                            // 2. Elementos de la lista
                             if (expandedStates[category] == true) {
                                 item {
                                     Column(modifier = Modifier.animateContentSize()) {
@@ -138,8 +132,6 @@ fun BusLinesScreen(
     }
 }
 
-// Componente visual para la cabecera de la categoría
-// Estilo: Fondo gris suave, texto en negrita, flecha a la derecha
 @Composable
 fun CategoryHeaderFlat(
     title: String,
@@ -148,7 +140,7 @@ fun CategoryHeaderFlat(
     onToggle: () -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f), // Gris suave
+        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onToggle() }
@@ -173,13 +165,9 @@ fun CategoryHeaderFlat(
             )
         }
     }
-    // Divisor fino para separar cabecera de items
     HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 }
 
-// ... BusLineItem function goes here (código de arriba) ...
-
-// ... ViewModelFactory ...
 class BusLinesViewModelFactory(
     private val apiService: ApiService
 ) : ViewModelProvider.Factory {

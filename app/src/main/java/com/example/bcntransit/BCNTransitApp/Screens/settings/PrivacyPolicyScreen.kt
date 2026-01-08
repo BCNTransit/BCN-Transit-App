@@ -1,28 +1,43 @@
 package com.example.bcntransit.BCNTransitApp.Screens.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Announcement
+import androidx.compose.material.icons.outlined.CloudSync
+import androidx.compose.material.icons.outlined.FolderShared
+import androidx.compose.material.icons.outlined.Gavel
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.bcntransit.app.R
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivacyPolicyScreen(
     onBackClick: () -> Unit
 ) {
+    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+
     Scaffold(
         topBar = {
             CustomTopBar(
-                title = { Text("Política de privacidad") },
+                title = { Text(stringResource(R.string.settings_privacy)) }, // Usa tus recursos
                 onBackClick = onBackClick
             )
         }
@@ -31,116 +46,172 @@ fun PrivacyPolicyScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.Start
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // --- HEADER ---
+            Icon(
+                imageVector = Icons.Outlined.Security,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(64.dp)
+                    .padding(bottom = 16.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
             Text(
                 text = "Política de privacidad",
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 16.dp)
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
 
-            Text(
-                text = """
-                    Última actualización: 27 de octubre de 2025
+            Spacer(modifier = Modifier.height(16.dp))
 
-                    BCNTransit respeta tu privacidad y se compromete a proteger tus datos personales. Esta política describe qué información recopilamos, cómo la usamos y qué derechos tienes como usuario.
-                """.trimIndent(),
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Justify
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            SectionTitle("1. Información que recopilamos")
-            SectionBody(
-                """
-                • Identificador del dispositivo (Android ID), usado de forma anónima para mejorar la estabilidad de la aplicación.  
-                • Preferencias de configuración, como el uso del tema oscuro o la recepción de notificaciones.  
-                • Datos agregados de uso (por ejemplo, frecuencia de apertura de la app o errores).  
-                BCNTransit **no recopila datos personales sensibles**, ubicaciones en tiempo real ni información de contacto.
-                """
-            )
-
-            SectionTitle("2. Uso de la información")
-            SectionBody(
-                """
-                Los datos se utilizan exclusivamente para:  
-                • Mostrar información en tiempo real del transporte público de Barcelona.  
-                • Enviar notificaciones sobre incidencias o alertas relevantes.  
-                • Mejorar el rendimiento y la experiencia de usuario.
-                """
-            )
-
-            SectionTitle("3. Compartición de datos")
-            SectionBody(
-                """
-                BCNTransit no comparte ni vende información personal a terceros.  
-                Algunos datos técnicos pueden ser procesados por servicios de terceros (por ejemplo, Firebase Cloud Messaging para notificaciones), siempre bajo sus propias políticas de privacidad.
-                """
-            )
-
-            SectionTitle("4. Seguridad")
-            SectionBody(
-                """
-                Implementamos medidas técnicas y organizativas para proteger tus datos frente a accesos no autorizados, pérdida o alteración.
-                """
-            )
-
-            SectionTitle("5. Tus derechos")
-            SectionBody(
-                """
-                Puedes solicitar en cualquier momento la eliminación de tus datos almacenados localmente desinstalando la aplicación.  
-                BCNTransit no almacena datos identificables en servidores externos.
-                """
-            )
-
-            SectionTitle("6. Cambios en esta política")
-            SectionBody(
-                """
-                Esta política puede actualizarse ocasionalmente. Te notificaremos los cambios importantes mediante una actualización dentro de la aplicación o en el sitio web oficial.
-                """
-            )
+            // Badge de fecha
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Text(
+                    text = "Última actualización: 27 oct. 2025",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(
-                text = "Si tienes dudas sobre esta política, puedes contactarnos a través de nuestros canales oficiales (GitHub o web).",
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Justify
-            )
+            // Introducción destacada
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "BCNTransit respeta tu privacidad y se compromete a proteger tus datos personales. Esta política describe qué información recopilamos, cómo la usamos y qué derechos tienes.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(16.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // --- SECCIONES LEGALES ---
+
+            PolicySection(
+                icon = Icons.Outlined.FolderShared,
+                title = "1. Información que recopilamos",
+                body = """
+                • Identificador del dispositivo (Android ID), usado de forma anónima para mejorar la estabilidad.
+                • Preferencias de configuración (tema oscuro, notificaciones).
+                • Datos agregados de uso (frecuencia, errores).
+                
+                BCNTransit no recopila datos sensibles, ubicaciones en tiempo real ni información de contacto.
+                """.trimIndent()
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            PolicySection(
+                icon = Icons.Outlined.CloudSync,
+                title = "2. Uso de la información",
+                body = """
+                Los datos se utilizan exclusivamente para:
+                • Mostrar información del transporte en tiempo real.
+                • Enviar notificaciones de incidencias.
+                • Mejorar el rendimiento de la app.
+                """.trimIndent()
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            PolicySection(
+                icon = Icons.Outlined.Announcement,
+                title = "3. Compartición de datos",
+                body = "BCNTransit no comparte ni vende información personal a terceros. Algunos datos técnicos pueden ser procesados por servicios como Firebase Cloud Messaging para notificaciones, bajo sus propias políticas."
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            PolicySection(
+                icon = Icons.Outlined.Lock,
+                title = "4. Seguridad",
+                body = "Implementamos medidas técnicas y organizativas para proteger tus datos frente a accesos no autorizados, pérdida o alteración."
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            PolicySection(
+                icon = Icons.Outlined.Gavel,
+                title = "5. Tus derechos",
+                body = "Puedes solicitar la eliminación de tus datos locales desinstalando la aplicación. BCNTransit no almacena datos identificables en servidores externos."
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            PolicySection(
+                icon = Icons.Outlined.Update,
+                title = "6. Cambios en esta política",
+                body = "Esta política puede actualizarse. Te notificaremos cambios importantes mediante la app o el sitio web oficial."
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Footer
             Text(
-                text = "© 2025 BCNTransit. Todos los derechos reservados.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth(),
+                text = "© $currentYear BCNTransit. Barcelona.",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Center
             )
         }
     }
 }
 
+// COMPONENTE AUXILIAR PARA SECCIONES LIMPIAS
 @Composable
-private fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(vertical = 8.dp)
-    )
-}
+private fun PolicySection(
+    icon: ImageVector,
+    title: String,
+    body: String
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        // Icono lateral alineado al título
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .size(24.dp)
+                .padding(top = 2.dp) // Ajuste visual fino
+        )
 
-@Composable
-private fun SectionBody(text: String) {
-    Text(
-        text = text.trimIndent(),
-        style = MaterialTheme.typography.bodyMedium,
-        textAlign = TextAlign.Justify,
-        modifier = Modifier.padding(bottom = 16.dp)
-    )
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    lineHeight = 22.sp, // Mejor lectura
+                    letterSpacing = 0.15.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Start // Justify a veces crea ríos blancos feos en móviles
+            )
+        }
+    }
 }

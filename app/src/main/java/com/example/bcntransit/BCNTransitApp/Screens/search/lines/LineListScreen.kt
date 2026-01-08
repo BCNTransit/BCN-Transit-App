@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.BCNTransitApp.components.InlineErrorBanner
+import com.bcntransit.app.R
 import com.bcntransit.app.api.ApiService
 import com.bcntransit.app.data.enums.TransportType
 import com.bcntransit.app.model.transport.LineDto
@@ -60,7 +62,7 @@ fun LineListScreen(
                             modifier = Modifier.size(42.dp)
                         )
                         Spacer(Modifier.width(16.dp))
-                        Text("Líneas", style = MaterialTheme.typography.titleLarge)
+                        Text(stringResource(R.string.menu_lines), style = MaterialTheme.typography.titleLarge)
                     }
                 },
             )
@@ -76,7 +78,7 @@ fun LineListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Color(0xFFDD5555)) // medium_red
+                    CircularProgressIndicator(color = Color(0xFFDD5555))
                 }
 
                 uiState.error != null -> InlineErrorBanner(uiState.error!!)
@@ -89,7 +91,7 @@ fun LineListScreen(
                 ) {
                     item {
                         Text(
-                            text = "Líneas disponibles",
+                            text = stringResource(R.string.lines_available),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(vertical = 8.dp)

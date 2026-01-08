@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.data.enums.BottomTab
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun BottomNavigationBar(
@@ -38,14 +39,14 @@ fun BottomNavigationBar(
                     ) {
                         Icon(
                             imageVector = tab.icon,
-                            contentDescription = tab.label,
+                            contentDescription = stringResource( tab.labelResId),
                             tint = iconColor
                         )
                     }
                 },
                 label = {
                     Text(
-                        text = tab.label,
+                        text = stringResource( tab.labelResId),
                         color = iconColor
                     )
                 },

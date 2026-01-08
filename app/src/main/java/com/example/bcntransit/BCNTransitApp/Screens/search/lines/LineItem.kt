@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.model.transport.LineDto
@@ -32,7 +33,7 @@ fun LineItem(line: LineDto, onClick: () -> Unit) {
         context.resources.getIdentifier(drawableName, "drawable", context.packageName)
             .takeIf { it != 0 } ?: context.resources.getIdentifier("${line.transport_type}", "drawable", context.packageName)
     }
-    val alertText = if (line.has_alerts) "Incidencias" else "Servicio normal"
+    val alertText = if (line.has_alerts) stringResource(R.string.incidents) else stringResource(R.string.normal_service)
     val alertColor = if (line.has_alerts) colorResource(R.color.red) else colorResource(R.color.dark_green)
 
     Column {
@@ -49,7 +50,6 @@ fun LineItem(line: LineDto, onClick: () -> Unit) {
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Icono
                 Icon(
                     painter = painterResource(drawableId),
                     contentDescription = null,
@@ -59,7 +59,6 @@ fun LineItem(line: LineDto, onClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Contenido
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {

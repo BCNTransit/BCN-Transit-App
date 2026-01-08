@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
@@ -48,7 +49,6 @@ import org.maplibre.android.plugins.annotation.SymbolManager
 import org.maplibre.android.plugins.annotation.SymbolOptions
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.LocalParking
@@ -111,13 +111,11 @@ fun MapScreen(
                 userLocation?.let { latLng ->
                     val cameraPosition = CameraPosition.Builder()
                         .target(latLng)
-                        .zoom(15.0) // Zoom fijo inicial (puedes poner 16.0 si prefieres más cerca)
+                        .zoom(15.0)
                         .build()
 
-                    // Usamos animateCamera para que sea suave, o moveCamera para instantáneo
                     map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1000, null)
-
-                    initialUserZoomDone = true // Marcamos como hecho para que no moleste al mover el mapa
+                    initialUserZoomDone = true
                 }
             }
         }
@@ -399,12 +397,12 @@ fun MapScreen(
                 Spacer(modifier = Modifier.height(5.dp))
 
                 val iconMap = mapOf(
-                    "Metro" to R.drawable.metro,
-                    "Bus" to R.drawable.bus,
-                    "Tram" to R.drawable.tram,
-                    "Rodalies" to R.drawable.rodalies,
-                    "FGC" to R.drawable.fgc,
-                    "Bicing" to R.drawable.bicing
+                    TransportType.METRO.type.capitalize() to R.drawable.metro,
+                    TransportType.BUS.type.capitalize() to R.drawable.bus,
+                    TransportType.TRAM.type.capitalize() to R.drawable.tram,
+                    TransportType.RODALIES.type.capitalize() to R.drawable.rodalies,
+                    TransportType.FGC.type.toUpperCase() to R.drawable.fgc,
+                    TransportType.BICING.type.capitalize() to R.drawable.bicing
                 )
 
                 if (!isLoadingNearbyStations && !isSearchActive) {
@@ -413,7 +411,14 @@ fun MapScreen(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        listOf("Metro", "Bus", "Tram", "Rodalies", "FGC", "Bicing").forEach { filter ->
+                        listOf(
+                            TransportType.METRO.type.capitalize(),
+                            TransportType.BUS.type.capitalize(),
+                            TransportType.TRAM.type.capitalize(),
+                            TransportType.RODALIES.type.capitalize(),
+                            TransportType.FGC.type.toUpperCase(),
+                            TransportType.BICING.type.capitalize()
+                        ).forEach { filter ->
                             FilterChip(
                                 selected = selectedFilters.contains(filter),
                                 enabled = !isLoadingNearbyStations,
@@ -473,7 +478,7 @@ fun MapScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = "Cargando estaciones cercanas...",
+                            text = stringResource(R.string.map_loading_stations),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -675,8 +680,6 @@ fun FilterPanel(
         }
     }
 }
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

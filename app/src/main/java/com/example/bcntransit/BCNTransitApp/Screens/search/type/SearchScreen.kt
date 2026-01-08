@@ -14,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.data.enums.SearchOption
+import com.bcntransit.app.data.enums.TransportType
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 
 @Composable
@@ -24,11 +26,11 @@ fun SearchScreen(
     onTypeSelected: (String) -> Unit
 ) {
     val searchItems = listOf(
-        Triple("Metro", "Ver líneas y estaciones de metro", R.drawable.metro),
-        Triple("Bus", "Ver líneas y paradas de bus", R.drawable.bus),
-        Triple("Tram", "Ver líneas y paradas de tram", R.drawable.tram),
-        Triple("Rodalies", "Ver líneas y estaciones de Rodalies", R.drawable.rodalies),
-        Triple("FGC", "Ver líneas y estaciones de FGC", R.drawable.fgc),
+        Triple(TransportType.METRO.type.capitalize(), stringResource(R.string.lines_and_stations, TransportType.METRO.type), R.drawable.metro),
+        Triple(TransportType.BUS.type.capitalize(), stringResource(R.string.lines_and_stops, TransportType.BUS.type), R.drawable.bus),
+        Triple(TransportType.TRAM.type.capitalize(), stringResource(R.string.lines_and_stops, TransportType.TRAM.type), R.drawable.tram),
+        Triple(TransportType.RODALIES.type.capitalize(), stringResource(R.string.lines_and_stations, TransportType.RODALIES.type), R.drawable.rodalies),
+        Triple(TransportType.FGC.type.uppercase(), stringResource(R.string.lines_and_stations, TransportType.FGC.type.uppercase()), R.drawable.fgc),
     )
 
     Scaffold(
@@ -46,7 +48,7 @@ fun SearchScreen(
                             tint = Color.Unspecified
                         )
                         Text(
-                            text = "Líneas",
+                            text = stringResource(R.string.menu_lines),
                             style = MaterialTheme.typography.headlineMedium
                         )
                     }
@@ -65,7 +67,7 @@ fun SearchScreen(
             ) {
                 item {
                     Text(
-                        text = "Selecciona el tipo de transporte para explorar sus líneas y estaciones disponibles.",
+                        text = stringResource(R.string.lines_select_transport_type),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -73,7 +75,7 @@ fun SearchScreen(
 
                 item {
                     Text(
-                        text = "Tipos de transporte disponibles",
+                        text = stringResource(R.string.lines_transport_types),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(vertical = 8.dp)

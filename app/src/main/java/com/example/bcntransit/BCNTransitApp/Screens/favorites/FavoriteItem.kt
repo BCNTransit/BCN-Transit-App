@@ -44,10 +44,8 @@ fun FavoriteItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    // Estado para mostrar u ocultar el diálogo
     var showDialog by remember { mutableStateOf(false) }
 
-    // Diálogo de confirmación
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },

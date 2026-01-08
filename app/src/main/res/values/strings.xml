@@ -1,33 +1,63 @@
 <resources>
     <string name="app_name">BCN Transit</string>
     <string name="widget_bcn_transit_description">"         Muestra una de tus estaciones favoritas, incluyendo la línea, dirección y próximos trenes.     "</string>
-    <string name="terms_title">Términos y Condiciones</string>
     <string name="back">Atrás</string>
-
-    <string name="terms_header">Condiciones de uso de la aplicación</string>
-    <string name="terms_intro">
-    Al utilizar esta aplicación, aceptas los siguientes términos y condiciones.
-    Por favor, léelos detenidamente antes de continuar.
-</string>
-
-    <string name="terms_section1_title">1. Uso permitido</string>
-    <string name="terms_section1_text">
-    Esta aplicación está destinada exclusivamente para uso personal e informativo.
-    No está permitido modificar, distribuir o utilizar su contenido con fines comerciales
-    sin autorización previa.
-</string>
-
-    <string name="terms_section2_title">2. Responsabilidad</string>
-    <string name="terms_section2_text">
-    El desarrollador no se hace responsable por daños o pérdidas derivados del uso
-    o mal uso de la aplicación, ni garantiza la disponibilidad continua del servicio.
-</string>
-
-    <string name="terms_last_update">Última actualización: Octubre 2025</string>
     <string name="metro">El metro de Barcelona abre todos los días a las 5 de la mañana. Las horas de finalización del servicio varían en función del tipo de día.\n\n
         Laborables (de lunes a jueves): hasta las 24.00 h.\n
         Viernes y vísperas de festivo: hasta las 2.00 h.\n
         Sábados: servicio continuo toda la noche.\n
         Domingos y festivos entre semana: hasta las 24.00 h.
     </string>
+    <string name="menu_map">Mapa</string>
+    <string name="menu_lines">Líneas</string>
+    <string name="menu_favourites">Favoritos</string>
+    <string name="menu_settings">Configuración</string>
+    <string name="map_loading_stations">Cargando estaciones cercanas...</string>
+    <string name="map_search_station">Buscar estación...</string>
+    <string name="settings_notifications">NOTIFICACIONES</string>
+    <string name="settings_receive_alerts">Recibir alertas</string>
+    <string name="settings_push_notifications">Notificaciones push sobre el estado del transporte</string>
+    <string name="settings_preferences">PREFERENCIAS</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_information">INFORMACIÓN</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_privacy">Política de privacidad</string>
+    <string name="settings_terms_and_conditions">Términos y condiciones</string>
+    <string name="settings_id">Identificador</string>
+    <string name="version">Versión 1.0</string>
+
+    <string name="about_title">Acerca de</string>
+    <string name="about_description">BCNTransit es tu compañero de viaje en Barcelona. Consulta tiempos en tiempo real, recibe alertas de servicio y localiza tus estaciones favoritas de Metro, Bus, Rodalies FGC y Bicing.</string>
+    <string name="about_contact_support">Contactar soporte</string>
+    <string name="about_visit_website">Visitar sitio web</string>
+    <string name="about_rate_app">Valorar aplicación</string>
+    <string name="about_developed_by">Diseñado y desarrollado por</string>
+
+    <string name="terms_title">Términos y Condiciones</string>
+    <string name="terms_header">Condiciones de uso</string>
+    <string name="terms_last_update">Actualizado: Octubre 2025</string>
+    <string name="terms_intro">Al descargar o utilizar la aplicación, estos términos se aplicarán automáticamente. Asegúrate de leerlos cuidadosamente antes de usar la aplicación.</string>
+
+    <string name="terms_section1_title">1. Precisión de los datos</string>
+    <string name="terms_section1_text">BCNTransit actúa como un intermediario que muestra información pública proporcionada por las operadoras de transporte (TMB, AMB, FGC). No garantizamos la exactitud, integridad o puntualidad de los horarios mostrados, ya que pueden verse afectados por incidencias externas.</string>
+
+    <string name="terms_section2_title">2. Uso prohibido</string>
+    <string name="terms_section2_text">Está prohibido intentar extraer el código fuente de la aplicación, traducir la app a otros idiomas con fines comerciales o intentar realizar ingeniería inversa. Tampoco se permite el uso de la API de la app de forma abusiva.</string>
+
+    <string name="terms_section3_title">3. Propiedad Intelectual</string>
+    <string name="terms_section3_text">La aplicación, el diseño y el código fuente son propiedad intelectual de BCNTransit. Los datos de transporte son propiedad de sus respectivos proveedores públicos.</string>
+
+    <string name="terms_section4_title">4. Limitación de responsabilidad</string>
+    <string name="terms_section4_text">El desarrollador no se hace responsable de las pérdidas directas o indirectas (como llegar tarde al trabajo o perder un enlace) derivadas de confiar en la información proporcionada por la aplicación.</string>
+    <string name="settings_updating_language">Actualizando idioma...</string>
+    <string name="lines_and_stations">Ver líneas y estaciones de %1$s</string>
+    <string name="lines_and_stops">Ver líneas y paradas de %1$s</string>
+    <string name="lines_select_transport_type">Selecciona el tipo de transporte para explorar sus líneas y estaciones disponibles.</string>
+    <string name="lines_transport_types">Tipos de transporte disponibles</string>
+    <string name="lines_available">Líneas disponibles</string>
+    <string name="bus_lines">Líneas de Bus</string>
+    <string name="incidents">Incidencias</string>
+    <string name="normal_service">Servicio normal</string>
+    <string name="see_details">Ver detalles</string>
+    <string name="availability">Disponibilidad</string>
 </resources>

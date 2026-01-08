@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.model.transport.LineDto
@@ -37,7 +37,7 @@ fun BusLineItem(
     onClick: () -> Unit,
     drawableId: Int
 ) {
-    val alertText = if (line.has_alerts) "Incidencias" else "Servicio normal"
+    val alertText = if (line.has_alerts) stringResource(R.string.incidents) else stringResource(R.string.normal_service)
     val alertColor = if (line.has_alerts) colorResource(R.color.red) else colorResource(R.color.dark_green)
 
     Column {
@@ -45,8 +45,8 @@ fun BusLineItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onClick() },
-            color = MaterialTheme.colorScheme.surface, // Fondo estándar
-            shape = RoundedCornerShape(0.dp) // Sin bordes redondeados
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(0.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -54,7 +54,6 @@ fun BusLineItem(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Icono
                 Icon(
                     painter = painterResource(drawableId),
                     contentDescription = null,
@@ -64,12 +63,11 @@ fun BusLineItem(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Contenido (Texto + Estado)
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = line.description, // O line.name dependiendo de qué quieras resaltar
+                        text = line.description,
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -93,16 +91,14 @@ fun BusLineItem(
                     }
                 }
 
-                // Flecha a la derecha
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "Ver detalles",
+                    contentDescription = stringResource(R.string.see_details),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
-        // Divisor idéntico a tu referencia
         HorizontalDivider(
             thickness = 1.dp,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
