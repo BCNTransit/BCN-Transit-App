@@ -53,8 +53,8 @@ class RoutesFactory(private val context: Context, intent: Intent) : RemoteViewsS
 
             setImageViewResource(R.id.img_line_id, lineDrawableId)
             setTextViewText(R.id.txt_direction_name, route.destination)
-            setTextViewText(R.id.txt_time_1, route.next_trips.getOrNull(0)?.arrival_time?.let { formatArrivalTime(it).text } ?: "--")
-            setTextViewText(R.id.txt_time_2, route.next_trips.getOrNull(1)?.arrival_time?.let { formatArrivalTime(it).text } ?: "--")
+            setTextViewText(R.id.txt_time_1, route.next_trips.getOrNull(0)?.arrival_time?.let { formatArrivalTime(context, it).text } ?: "--")
+            setTextViewText(R.id.txt_time_2, route.next_trips.getOrNull(1)?.arrival_time?.let { formatArrivalTime(context, it).text } ?: "--")
         }
     }
 

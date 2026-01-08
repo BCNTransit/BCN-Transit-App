@@ -52,7 +52,6 @@
 
     <string name="terms_section4_title">4. Limitation of Liability</string>
     <string name="terms_section4_text">The developer is not liable for direct or indirect losses (such as being late for work or missing a connection) resulting from reliance on the information provided by the app.</string>
-    <string name="settings_updating_language">Updating language...</string>
     <string name="lines_and_stations">View %1$s lines and stations</string>
     <string name="lines_and_stops">View %1$s lines and stops</string>
     <string name="lines_select_transport_type">Select a transport type to explore their available lines and stations</string>
@@ -137,4 +136,15 @@
     <string name="location_permission_required">Location permission required</string>
     <string name="location_permission_explanation">To show nearby stops and your position on the map, we need access to your location.</string>
     <string name="open_settings">Open Configuration</string>
+    <string name="settings_theme">App Theme</string>
+    <string name="settings_theme_select">Select theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="id_copied">ID copied to clipboard</string>
+    <string name="settings_updating_language">Updating language...</string>
+    <string name="route_arriving">Arriving</string>
+    <string name="route_back_to_list">Back to the list</string>
+    <string name="show_more">Show more</string>
+    <string name="show_less">Show less</string>
 </resources>

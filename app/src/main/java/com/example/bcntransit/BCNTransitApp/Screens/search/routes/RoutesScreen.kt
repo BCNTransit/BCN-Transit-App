@@ -1,11 +1,13 @@
 package com.bcntransit.app.screens.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Elevator
 import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.Stairs
@@ -37,9 +39,11 @@ import com.bcntransit.app.api.ApiClient
 import com.bcntransit.app.api.ApiService
 import com.bcntransit.app.data.enums.TransportType
 import com.bcntransit.app.model.FavoriteDto
+import com.bcntransit.app.model.transport.RouteDto
 import com.bcntransit.app.screens.map.getDrawableIdByName
 import com.bcntransit.app.util.LanguageManager
 import com.bcntransit.app.util.getAndroidId
+import com.example.bcntransit.BCNTransitApp.Screens.search.routes.CompactRouteCard
 import com.example.bcntransit.BCNTransitApp.components.CustomFloatingActionButton
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 import kotlinx.coroutines.launch
@@ -79,6 +83,8 @@ fun RoutesScreen(
     var isLoadingFavorite by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val currentLangCode = remember { LanguageManager.getSavedLanguage(context) }
+
+    var selectedRoute by remember { mutableStateOf<RouteDto?>(null) }
 
     if (selectedStation == null) {
         Box(
@@ -284,17 +290,96 @@ fun RoutesScreen(
 
 
                         // RUTAS
-                        item {Row { Text(stringResource(R.string.routes_arrivals), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }}
+                        item {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (selectedRoute == null) {
+                                    Text(
+                                        stringResource(R.string.routes_arrivals),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.padding(top = 16.dp)
+                                    )
+                                } else {
+                                    Spacer(Modifier.padding(top = 16.dp))
+                                }
+                            }
+                        }
+
                         if (routesState.loading && routesState.routes.isEmpty()) {
                             item { CircularProgressIndicator(modifier = Modifier.padding(16.dp), color = colorResource(R.color.medium_red)) }
                         } else if (routesState.error != null) {
                             item { InlineErrorBanner(routesState.error!!) }
                         } else if (routesState.routes.isEmpty()){
-                            item {Text(stringResource(R.string.routes_not_available))}
+                            item { Text(stringResource(R.string.routes_not_available)) }
                         } else {
-                            items(routesState.routes) { route ->
-                                RouteCard(route, routesState.loading)
-                                Spacer(modifier = Modifier.height(16.dp))
+                            // CASO 1: Es BUS y tenemos una ruta seleccionada -> MOSTRAMOS SOLO ESA (Grande)
+                            if (selectedStation!!.transport_type == TransportType.BUS.type && selectedRoute != null) {
+                                item {
+                                    Column {
+                                        // Botón "Atrás" para volver a la lista (UX importante)
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(bottom = 8.dp)
+                                                .clickable { selectedRoute = null },
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                                contentDescription = stringResource(R.string.back),
+                                                modifier = Modifier.size(16.dp),
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = stringResource(R.string.route_back_to_list),
+                                                style = MaterialTheme.typography.labelMedium,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+
+                                        RouteCard(selectedRoute!!, routesState.loading)
+                                    }
+                                }
+                            }
+                            // CASO 2: Es BUS y NO hay selección -> MOSTRAMOS GRID (Compactas)
+                            else if (selectedStation!!.transport_type == TransportType.BUS.type && routesState.routes.size > 1) {
+                                val chunks = routesState.routes.chunked(2)
+                                items(chunks) { rowRoutes ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        // Columna 1
+                                        Box(modifier = Modifier.weight(1f)) {
+                                            CompactRouteCard(
+                                                route = rowRoutes[0],
+                                                isLoading = routesState.loading,
+                                                onClick = { selectedRoute = rowRoutes[0] } // <--- AQUÍ GUARDAMOS LA SELECCIÓN
+                                            )
+                                        }
+
+                                        // Columna 2
+                                        Box(modifier = Modifier.weight(1f)) {
+                                            if (rowRoutes.size > 1) {
+                                                CompactRouteCard(
+                                                    route = rowRoutes[1],
+                                                    isLoading = routesState.loading,
+                                                    onClick = { selectedRoute = rowRoutes[1] } // <--- AQUÍ TAMBIÉN
+                                                )
+                                            } else {
+                                                Spacer(modifier = Modifier.fillMaxWidth())
+                                            }
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                }
+                            }
+                            // CASO 3: NO es BUS (Metro, Tram, etc.) -> Lista normal siempre
+                            else {
+                                items(routesState.routes) { route ->
+                                    RouteCard(route, routesState.loading)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                             }
                         }
 

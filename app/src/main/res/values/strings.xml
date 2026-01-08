@@ -49,7 +49,6 @@
 
     <string name="terms_section4_title">4. Limitación de responsabilidad</string>
     <string name="terms_section4_text">El desarrollador no se hace responsable de las pérdidas directas o indirectas (como llegar tarde al trabajo o perder un enlace) derivadas de confiar en la información proporcionada por la aplicación.</string>
-    <string name="settings_updating_language">Actualizando idioma...</string>
     <string name="lines_and_stations">Ver líneas y estaciones de %1$s</string>
     <string name="lines_and_stops">Ver líneas y paradas de %1$s</string>
     <string name="lines_select_transport_type">Selecciona el tipo de transporte para explorar sus líneas y estaciones disponibles.</string>
@@ -134,4 +133,15 @@
     <string name="location_permission_required">Permiso de ubicación requerido</string>
     <string name="location_permission_explanation">Para mostrarte las paradas cercanas y tu posición en el mapa, necesitamos acceso a tu ubicación.</string>
     <string name="open_settings">Abrir Configuración</string>
+    <string name="settings_theme">Tema de la aplicación</string>
+    <string name="settings_theme_select">Seleccionar tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Sistema</string>
+    <string name="id_copied">ID copiado al portapapeles</string>
+    <string name="settings_updating_language">Actualizando idioma...</string>
+    <string name="route_arriving">Llegando</string>
+    <string name="route_back_to_list">Volver a la lista</string>
+    <string name="show_more">Ver más</string>
+    <string name="show_less">Ver menos</string>
 </resources>

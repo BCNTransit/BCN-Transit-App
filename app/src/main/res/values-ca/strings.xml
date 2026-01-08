@@ -51,7 +51,6 @@
 
     <string name="terms_section4_title">4. Limitació de responsabilitat</string>
     <string name="terms_section4_text">El desenvolupador no es fa responsable de les pèrdues directes o indirectes (com arribar tard a la feina o perdre un enllaç) derivades de confiar en la informació proporcionada per l\'aplicació.</string>
-    <string name="settings_updating_language">Actualitzant l\'idioma...</string>
     <string name="lines_and_stations">Veure línies i estacions de %1$s</string>
     <string name="lines_and_stops">Veure línies i parades de %1$s</string>
     <string name="lines_select_transport_type">Selecciona el tipus de transport per a explorar les seves línies y estacions disponibles</string>
@@ -136,4 +135,15 @@
     <string name="location_permission_required">Permis d\'ubicació requerit</string>
     <string name="location_permission_explanation">Per mostrar-te les parades properes i la teva posició al mapa, necessitem accés a la teva ubicació.</string>
     <string name="open_settings">Obrir Configuració</string>
+    <string name="settings_theme">Tema de l\'aplicació</string>
+    <string name="settings_theme_select">Seleccionar tema</string>
+    <string name="theme_light">Clar</string>
+    <string name="theme_dark">Fosc</string>
+    <string name="theme_system">Sistema</string>
+    <string name="id_copied">ID copiat al porta-retalls</string>
+    <string name="settings_updating_language">Actualitzant idioma...</string>
+    <string name="route_arriving">Arribant</string>
+    <string name="route_back_to_list">Tornar a la llista</string>
+    <string name="show_more">Veure més</string>
+    <string name="show_less">Veure menys</string>
 </resources>

@@ -77,7 +77,7 @@ class BcnTransitWidgetProvider : AppWidgetProvider() {
                         putString("widget_${widgetId}_route_${index}_line_name", route.line_name)
                         putString(
                             "widget_${widgetId}_route_${index}_times",
-                            route.next_trips.joinToString(",") { formatArrivalTime(it.arrival_time).text }
+                            route.next_trips.joinToString(",") { formatArrivalTime(context, it.arrival_time).text }
                         )
                     }
                     putInt("widget_${widgetId}_route_count", routes.size)

@@ -1,8 +1,10 @@
 package com.bcntransit.app.screens.settings
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,11 +15,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.SettingsSystemDaydream
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,12 +32,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bcntransit.app.R
+import com.bcntransit.app.ui.theme.AppThemeMode
 import com.bcntransit.app.util.LanguageManager
 import com.bcntransit.app.util.getAndroidId
 import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModel
@@ -39,6 +47,7 @@ import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModelFa
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +59,8 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val idCopied = stringResource(R.string.id_copied)
+
     val viewModel: SettingsViewModel = viewModel(
         factory = SettingsViewModelFactory(context, getAndroidId(context))
     )
@@ -57,14 +68,15 @@ fun SettingsScreen(
 
     var isRestarting by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) } // Nuevo estado para diálogo de tema
+
     val currentLangCode = remember { LanguageManager.getSavedLanguage(context) }
 
-    // Función para copiar el ID al portapapeles
     fun copyIdToClipboard() {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Device ID", getAndroidId(context))
         clipboard.setPrimaryClip(clip)
-        Toast.makeText(context, "ID copiado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, idCopied, Toast.LENGTH_SHORT).show()
     }
 
     val currentLanguageName = when (currentLangCode) {
@@ -74,10 +86,18 @@ fun SettingsScreen(
         else -> "Español"
     }
 
+    // Texto para mostrar la selección actual
+    val currentThemeName = when (state.themeMode) { // Asume que state tiene themeMode
+        AppThemeMode.LIGHT -> stringResource(R.string.theme_light)
+        AppThemeMode.DARK -> stringResource(R.string.theme_dark)
+        else -> stringResource(R.string.theme_light) // Default a Light si es null o System
+    }
+
     if (isRestarting) {
         RestartLoadingDialog()
     }
 
+    // Diálogo de Idioma
     if (showLanguageDialog) {
         LanguageSelectionDialog(
             currentLanguageCode = currentLangCode,
@@ -88,10 +108,22 @@ fun SettingsScreen(
                     isRestarting = true
                     delay(500)
                     LanguageManager.setLocale(context, code)
-                    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
-                        (context as? android.app.Activity)?.recreate()
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                        (context as? Activity)?.recreate()
                     }
                 }
+            }
+        )
+    }
+
+    // Nuevo Diálogo de Tema
+    if (showThemeDialog) {
+        ThemeSelectionDialog(
+            currentTheme = state.themeMode,
+            onDismiss = { showThemeDialog = false },
+            onThemeSelected = { newTheme ->
+                showThemeDialog = false
+                viewModel.setThemeMode(newTheme)
             }
         )
     }
@@ -122,7 +154,7 @@ fun SettingsScreen(
                 onCheckedChange = { viewModel.toggleReceiveAlerts(it) }
             )
 
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp)) // Indentado estilo Material
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
             // --- SECCIÓN 2: PREFERENCIAS ---
             SettingsSectionHeader(title = stringResource(R.string.settings_preferences))
@@ -132,6 +164,16 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_language),
                 subtitle = currentLanguageName,
                 onClick = { showLanguageDialog = true }
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+
+            // NUEVO ITEM: TEMA
+            SettingsNavigationItem(
+                icon = Icons.Outlined.Palette,
+                title = stringResource(R.string.settings_theme),
+                subtitle = currentThemeName,
+                onClick = { showThemeDialog = true }
             )
 
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
@@ -164,7 +206,6 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // ID Copiable con estilo de "Badge"
                 Surface(
                     onClick = { copyIdToClipboard() },
                     shape = RoundedCornerShape(8.dp),
@@ -184,7 +225,7 @@ fun SettingsScreen(
                             text = getAndroidId(context),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                            fontFamily = FontFamily.Monospace
                         )
                     }
                 }
@@ -194,13 +235,63 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
-
-                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 }
 
+@Composable
+fun ThemeSelectionDialog(
+    currentTheme: AppThemeMode,
+    onDismiss: () -> Unit,
+    onThemeSelected: (AppThemeMode) -> Unit
+) {
+    val options = listOf(
+        Triple(AppThemeMode.LIGHT, stringResource(R.string.theme_light), Icons.Outlined.LightMode),
+        Triple(AppThemeMode.DARK, stringResource(R.string.theme_dark), Icons.Outlined.DarkMode),
+        Triple(AppThemeMode.SYSTEM, stringResource(R.string.theme_system), Icons.Outlined.SettingsSystemDaydream)
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.settings_theme_select)) },
+        text = {
+            Column {
+                options.forEach { (mode, name, icon) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (mode == currentTheme),
+                                onClick = { onThemeSelected(mode) },
+                                role = Role.RadioButton
+                            )
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (mode == currentTheme),
+                            onClick = null
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = name, style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        }
+    )
+}
 
 @Composable
 fun SettingsSectionHeader(title: String) {

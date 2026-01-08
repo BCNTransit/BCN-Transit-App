@@ -79,6 +79,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.compose.runtime.runtime)
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")

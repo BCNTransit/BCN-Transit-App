@@ -1,5 +1,7 @@
 package com.bcntransit.app.utils
 
+import android.content.Context
+import com.bcntransit.app.R
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -9,19 +11,19 @@ data class ArrivalDisplay(
     val showExactTime: Boolean
 )
 
-fun formatArrivalTime(arrivalEpochSeconds: Long): ArrivalDisplay {
+// 1. Añadimos 'context' como parámetro
+fun formatArrivalTime(context: Context, arrivalEpochSeconds: Long): ArrivalDisplay {
     val nowMillis = System.currentTimeMillis()
     val arrivalMillis = arrivalEpochSeconds * 1000
 
-    // Calculamos tiempo restante
-    val remaining = remainingTime(arrivalEpochSeconds)
+    // 2. Pasamos el context a la función privada
+    val remaining = remainingTime(context, arrivalEpochSeconds)
 
-    // Mostrar hora exacta si falta más de 1h
+    // Lógica para decidir si mostramos hora exacta (> 1 hora)
     val showExactTime = arrivalMillis - nowMillis > TimeUnit.HOURS.toMillis(1)
 
     if (!showExactTime) return ArrivalDisplay(remaining, false)
 
-    // Comprobar si es otro día
     val nowCal = Calendar.getInstance()
     val arrivalCal = Calendar.getInstance().apply { timeInMillis = arrivalMillis }
     val showDate = nowCal.get(Calendar.YEAR) != arrivalCal.get(Calendar.YEAR) ||
@@ -34,13 +36,15 @@ fun formatArrivalTime(arrivalEpochSeconds: Long): ArrivalDisplay {
     return ArrivalDisplay(text, true)
 }
 
-private fun remainingTime(arrivalEpochSeconds: Long): String {
+// 3. Añadimos 'context' aquí también
+private fun remainingTime(context: Context, arrivalEpochSeconds: Long): String {
     val nowMs = System.currentTimeMillis()
     val arrivalMs = arrivalEpochSeconds * 1000
     val diffMs = arrivalMs - nowMs
 
     return if (diffMs <= 40000) {
-        "Llegando"
+        // SOLUCIÓN: Usamos context.getString() para obtener el texto real
+        context.getString(R.string.route_arriving)
     } else {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(diffMs)
         val seconds = TimeUnit.MILLISECONDS.toSeconds(diffMs) % 60
