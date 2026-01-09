@@ -55,7 +55,6 @@ fun StationItem(
     LaunchedEffect(station.code, currentUserId) {
         try {
             isFavorite = ApiClient.userApiService.userHasFavorite(
-                userId = currentUserId,
                 type = lineType,
                 itemId = station.code
             )
@@ -126,7 +125,7 @@ fun StationItem(
                     if (isFavorite) {
                         try {
                             isLoadingFavorite = true
-                            ApiClient.userApiService.deleteUserFavorite(currentUserId, lineType, station.code)
+                            ApiClient.userApiService.deleteUserFavorite(lineType, station.code)
                             isFavorite = false
                         } catch(e: Exception) {
                             e.printStackTrace()
@@ -137,7 +136,6 @@ fun StationItem(
                         try {
                             isLoadingFavorite = true
                             ApiClient.userApiService.addUserFavorite(
-                                currentUserId,
                                 favorite = FavoriteDto(
                                         USER_ID = currentUserId,
                                         TYPE = lineType,

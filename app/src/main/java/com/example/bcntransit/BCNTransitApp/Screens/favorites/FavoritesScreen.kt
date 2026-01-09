@@ -45,7 +45,7 @@ fun FavoritesScreen(
         loading = true
         error = null
         try {
-            favorites = ApiClient.userApiService.getUserFavorites(currentUserId)
+            favorites = ApiClient.userApiService.getUserFavorites()
         } catch (e: Exception) {
             e.printStackTrace()
             error = e.message
@@ -128,13 +128,12 @@ fun FavoritesScreen(
                                             loading = true
 
                                             val deleted = ApiClient.userApiService.deleteUserFavorite(
-                                                currentUserId,
                                                 fav.TYPE,
                                                 fav.STATION_CODE
                                             )
 
                                             if (deleted) {
-                                                favorites = ApiClient.userApiService.getUserFavorites(currentUserId)
+                                                favorites = ApiClient.userApiService.getUserFavorites()
                                                 loading = false
                                                 snackbarHostState.showSnackbar(favoriteDeleted)
                                             } else {

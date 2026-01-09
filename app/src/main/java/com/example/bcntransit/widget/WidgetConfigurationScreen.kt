@@ -69,7 +69,7 @@ fun WidgetConfigurationScreen(
         loading = true
         error = null
         try {
-            favorites = ApiClient.userApiService.getUserFavorites(currentUserId)
+            favorites = ApiClient.userApiService.getUserFavorites()
         } catch (e: Exception) {
             e.printStackTrace()
             error = e.message

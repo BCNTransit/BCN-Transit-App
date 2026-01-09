@@ -70,7 +70,6 @@ fun BicingStationScreen(
         if (station != null) {
             try {
                 isFavorite = ApiClient.userApiService.userHasFavorite(
-                    userId = currentUserId,
                     type = TransportType.BICING.type,
                     itemId = station!!.id
                 )
@@ -155,14 +154,12 @@ fun BicingStationScreen(
                                                 isLoadingFavorite = true
                                                 if (isFavorite) {
                                                     ApiClient.userApiService.deleteUserFavorite(
-                                                        currentUserId,
                                                         TransportType.BICING.type,
                                                         selectedStation.id
                                                     )
                                                     isFavorite = false
                                                 } else {
                                                     ApiClient.userApiService.addUserFavorite(
-                                                        currentUserId,
                                                         favorite = FavoriteDto(
                                                             USER_ID = currentUserId,
                                                             TYPE = TransportType.BICING.type,

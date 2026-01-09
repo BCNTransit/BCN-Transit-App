@@ -11,42 +11,35 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UserApiService {
-    @POST("users/{userId}/register")
+    @POST("users/register")
     suspend fun registerUser(
-        @Path("userId") userId: String,
         @Body body: Map<String, String>
     ): Boolean
 
-    @POST("users/{userId}/notifications/toggle/{status}")
+    @POST("users/notifications/toggle/{status}")
     suspend fun toggleUserNotifications(
-        @Path("userId") userId: String,
         @Path("status") status: Boolean
     ): Boolean
 
-    @GET("users/{userId}/notifications/configuration")
-    suspend fun getUserNotificationsConfiguration(
-        @Path("userId") userId: String
-    ): Boolean
+    @GET("users/notifications/configuration")
+    suspend fun getUserNotificationsConfiguration(): Boolean
 
-    @GET("users/{userId}/favorites")
-    suspend fun getUserFavorites(@Path("userId") userId: String): List<FavoriteDto>
+    @GET("users/favorites")
+    suspend fun getUserFavorites(): List<FavoriteDto>
 
-    @POST("users/{userId}/favorites")
+    @POST("users/favorites")
     suspend fun addUserFavorite(
-        @Path("userId") userId: String,
         @Body favorite: FavoriteDto
     ): Boolean
 
-    @DELETE("users/{userId}/favorites")
+    @DELETE("users/favorites")
     suspend fun deleteUserFavorite(
-        @Path("userId") userId: String,
         @Query("type") type: String,
         @Query("item_id") itemId: String
     ): Boolean
 
-    @GET("users/{userId}/favorites/exists")
+    @GET("users/favorites/exists")
     suspend fun userHasFavorite(
-        @Path("userId") userId: String,
         @Query("type") type: String,
         @Query("item_id") itemId: String
     ): Boolean

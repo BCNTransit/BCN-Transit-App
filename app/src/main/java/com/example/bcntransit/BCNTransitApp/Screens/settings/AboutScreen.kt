@@ -44,10 +44,9 @@ fun AboutScreen(
         context.startActivity(intent)
     }
 
-    // Función para enviar email
     fun sendEmail() {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:support@bcntransit.com") // Pon tu email real
+            data = Uri.parse("mailto:bcntransit.app@gmail.com")
             putExtra(Intent.EXTRA_SUBJECT, "Feedback BCNTransit Android")
         }
         context.startActivity(intent)

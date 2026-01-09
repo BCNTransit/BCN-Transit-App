@@ -17,7 +17,7 @@ class RegisterViewModel : ViewModel() {
                     "fcmToken" to fcmToken
                 )
 
-                val response = ApiClient.userApiService.registerUser(androidId, body)
+                val response = ApiClient.userApiService.registerUser(body)
 
                 if (response) {
                     Log.d("UserRegister", "User registered successfully: androidId=$androidId")

@@ -62,7 +62,7 @@ class SettingsViewModel(
     private fun fetchRemoteSettings() {
         viewModelScope.launch {
             try {
-                val receiveAlerts = ApiClient.userApiService.getUserNotificationsConfiguration(androidId)
+                val receiveAlerts = ApiClient.userApiService.getUserNotificationsConfiguration()
                 _state.value = _state.value.copy(receiveAlerts = receiveAlerts)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(receiveAlerts = true)
@@ -75,7 +75,7 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             try {
-                ApiClient.userApiService.toggleUserNotifications(androidId, enabled)
+                ApiClient.userApiService.toggleUserNotifications(enabled)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(receiveAlerts = !enabled)
             }

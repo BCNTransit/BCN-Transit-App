@@ -38,7 +38,6 @@
 
     <string name="terms_title">Terms and Conditions</string>
     <string name="terms_header">Terms of Use</string>
-    <string name="terms_last_update">Updated: October 2025</string>
     <string name="terms_intro">By downloading or using the app, these terms will automatically apply to you. Make sure you read them carefully before using the app.</string>
 
     <string name="terms_section1_title">1. Data Accuracy</string>
@@ -106,7 +105,7 @@
     <string name="routes_connections">Connections</string>
     <string name="routes_not_available">No available routes.</string>
     <string name="routes_direction">Direction</string>
-    <string name="privacy_last_update">Last Update: January 2026</string>
+    <string name="last_update">Last Update: January 2026</string>
     <string name="privacy_intro">BCNTransit respects your privacy and is committed to protecting your personal data. This policy describes what information we collect, how we use it, and what rights you have.</string>
     <string name="privacy_section1_title">1. Information we collect</string>
     <string name="privacy_section1_body">

@@ -73,7 +73,7 @@ fun TermsAndConditionsScreen(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.terms_last_update),
+                    text = stringResource(R.string.last_update),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

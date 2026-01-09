@@ -98,7 +98,6 @@ fun RoutesScreen(
         LaunchedEffect(selectedStation!!.code, currentUserId) {
             try {
                 isFavorite = ApiClient.userApiService.userHasFavorite(
-                    userId = currentUserId,
                     type = selectedStation!!.transport_type,
                     itemId = selectedStation!!.code
                 )
@@ -180,7 +179,6 @@ fun RoutesScreen(
                                                 try {
                                                     isLoadingFavorite = true
                                                     ApiClient.userApiService.deleteUserFavorite(
-                                                        currentUserId,
                                                         selectedStation!!.transport_type,
                                                         selectedStation!!.code
                                                     )
@@ -194,7 +192,6 @@ fun RoutesScreen(
                                                 try {
                                                     isLoadingFavorite = true
                                                     ApiClient.userApiService.addUserFavorite(
-                                                        currentUserId,
                                                         favorite = FavoriteDto(
                                                             USER_ID = currentUserId,
                                                             TYPE = selectedStation!!.transport_type,

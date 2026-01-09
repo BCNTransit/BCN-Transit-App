@@ -2,6 +2,8 @@ package com.bcntransit.app.api
 
 
 import com.bcntransit.app.data.enums.TransportType
+import com.example.bcntransit.api.AuthInterceptor
+import com.example.bcntransit.app.AuthManager
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -20,6 +22,7 @@ object ApiClient {
         .connectTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
+        .addInterceptor(AuthInterceptor(AuthManager()))
         .build()
 
     private val retrofit = Retrofit.Builder()
