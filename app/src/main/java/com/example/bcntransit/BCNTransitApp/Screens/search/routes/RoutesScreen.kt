@@ -354,7 +354,7 @@ fun RoutesScreen(
                                             CompactRouteCard(
                                                 route = rowRoutes[0],
                                                 isLoading = routesState.loading,
-                                                onClick = { selectedRoute = rowRoutes[0] } // <--- AQUÍ GUARDAMOS LA SELECCIÓN
+                                                onClick = { selectedRoute = rowRoutes[0] }
                                             )
                                         }
 
@@ -364,7 +364,7 @@ fun RoutesScreen(
                                                 CompactRouteCard(
                                                     route = rowRoutes[1],
                                                     isLoading = routesState.loading,
-                                                    onClick = { selectedRoute = rowRoutes[1] } // <--- AQUÍ TAMBIÉN
+                                                    onClick = { selectedRoute = rowRoutes[1] }
                                                 )
                                             } else {
                                                 Spacer(modifier = Modifier.fillMaxWidth())

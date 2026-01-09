@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bcntransit.app.BCNTransitApp.components.ArrivalCountdown
 import com.bcntransit.app.R
 import com.bcntransit.app.model.transport.RouteDto
 import com.bcntransit.app.utils.formatArrivalTime
@@ -128,14 +129,19 @@ fun CompactRouteCard(
                         val minutes = ((nextTrip.arrival_time - nowSeconds) / 60).coerceAtLeast(0)
 
                         val timeText = if (minutes == 0L) stringResource(R.string.route_arriving) else "${minutes} min"
-                        val textColor = if (minutes < 5) colorResource(R.color.medium_red) else MaterialTheme.colorScheme.onSurface
+                        val textColor = if (minutes < 3) colorResource(R.color.medium_red) else MaterialTheme.colorScheme.onSurface
 
-                        Text(
-                            text = timeText,
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = textColor
-                        )
+                        if (minutes < 3) {
+                            ArrivalCountdown(nextTrip.arrival_time, 0, textColor, isCompact = true)
+                        } else {
+                            Text(
+                                text = timeText,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = textColor
+                            )
+                        }
+
                     } else {
                         Text(
                             text = stringResource(R.string.bicing_out_of_service),

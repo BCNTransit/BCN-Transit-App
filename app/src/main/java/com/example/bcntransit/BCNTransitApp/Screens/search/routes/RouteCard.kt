@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bcntransit.app.BCNTransitApp.components.ArrivalCountdown
 import com.bcntransit.app.R
+import com.bcntransit.app.model.transport.NextTripDto
 import com.bcntransit.app.model.transport.RouteDto
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -119,7 +120,7 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                     val limit = if (isExpanded) 5 else 2
                     val visibleTrips = route.next_trips.take(limit)
 
-                    visibleTrips.forEachIndexed { index, trip ->
+                    /*visibleTrips.forEachIndexed { index, trip ->
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
                             Spacer(modifier = Modifier.width(12.dp))
                             Box(
@@ -201,6 +202,87 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                         } else {
                             Spacer(modifier = Modifier.height(4.dp))
                         }
+                    }*/
+
+                    val hasAnyDelay = visibleTrips.any { it.delay_in_minutes != 0 }
+                    if (!hasAnyDelay) {
+                        // --- COMPACT MODE ---
+                        val chunks = visibleTrips.chunked(2)
+                        chunks.forEachIndexed { chunkIndex, rowTrips ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Box(modifier = Modifier.weight(1f).padding(8.dp,0.dp,0.dp,0.dp)) {
+                                    val realIndex = (chunkIndex * 2)
+                                    TripBasicInfo(rowTrips[0], realIndex)
+                                }
+
+                                Box(modifier = Modifier.weight(1f)) {
+                                    if (rowTrips.size > 1) {
+                                        val realIndex = (chunkIndex * 2) + 1
+                                        TripBasicInfo(rowTrips[1], realIndex)
+                                    } else {
+                                        Spacer(modifier = Modifier.fillMaxWidth())
+                                    }
+                                }
+                            }
+                        }
+                        //Spacer(modifier = Modifier.height(4.dp))
+
+                    } else {
+                        // --- DETAILED MODE ---
+                        visibleTrips.forEachIndexed { index, trip ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
+                            ) {
+                                Spacer(modifier = Modifier.width(12.dp))
+                                TripBasicInfo(trip, index)
+                            }
+
+                            if (trip.delay_in_minutes != 0) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 2.dp)
+                                ) {
+                                    Spacer(modifier = Modifier.width(48.dp))
+
+                                    val formatter = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+                                    val realTime = Date(trip.arrival_time * 1000)
+                                    val plannedTime = Date((trip.arrival_time - trip.delay_in_minutes * 60) * 1000)
+
+                                    val plannedStr = formatter.format(plannedTime) + "h"
+                                    val realStr = formatter.format(realTime) + "h"
+                                    val delaySign = if (trip.delay_in_minutes > 0) "+" else ""
+                                    val delayStr = " ($delaySign${trip.delay_in_minutes} min)"
+                                    val delayColor = if (trip.delay_in_minutes > 0) colorResource(R.color.medium_red) else colorResource(R.color.dark_green)
+
+                                    Text(
+                                        text = buildAnnotatedString {
+                                            withStyle(style = SpanStyle(textDecoration = TextDecoration.LineThrough, color = MaterialTheme.colorScheme.onSurfaceVariant)) {
+                                                append(plannedStr)
+                                            }
+                                            append(" → ")
+                                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                                                append(realStr)
+                                            }
+                                            withStyle(style = SpanStyle(color = delayColor)) {
+                                                append(delayStr)
+                                            }
+                                        },
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                            } else {
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
                     }
 
                     if (route.next_trips.size > 2) {
@@ -229,6 +311,41 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun TripBasicInfo(trip: NextTripDto, index: Int) {
+    Row(verticalAlignment = Alignment.Bottom) {
+
+        // Círculo con número
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .background(color = colorResource(R.color.next_arrival_background), shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                (index + 1).toString(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorResource(R.color.next_arrival_text),
+                modifier = Modifier.padding(bottom = 1.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        ArrivalCountdown(arrivalEpochSeconds = trip.arrival_time, index)
+
+        if (!trip.platform.isNullOrEmpty()) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Vía: ${trip.platform}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
         }
     }
 }
