@@ -29,6 +29,11 @@ jobs:
         DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
       run: echo $DATA | base64 -d > app/google-services.json
 
+    - name: Create local.properties
+      env:
+        DATA: ${{ secrets.BCN_TRANSIT_API_KEY }}
+      run: echo "BCN_TRANSIT_API_KEY=$DATA" > local.properties
+
     - name: Build with Gradle
       run: ./gradlew assembleDebug
 
