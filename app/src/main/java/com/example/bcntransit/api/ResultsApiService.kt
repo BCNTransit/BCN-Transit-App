@@ -21,12 +21,9 @@ interface ResultsApiService {
 
     @GET("results/search")
     suspend fun getResultsByName(
-        @Query("name") name: String,
-        @Query("user_id") userId: String
+        @Query("name") name: String
     ): List<NearbyStation>
 
     @GET("results/search/history")
-    suspend fun getSearchHistory(
-        @Query("user_id") userId: String
-    ): List<String>
+    suspend fun getSearchHistory(): List<String>
 }

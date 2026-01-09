@@ -34,7 +34,6 @@
     import com.bcntransit.app.screens.search.BicingStationScreen
     import com.bcntransit.app.screens.search.StationListScreen
     import com.bcntransit.app.screens.settings.SettingsScreen
-    import com.bcntransit.app.util.getAndroidId
     import com.bcntransit.app.widget.RegisterViewModel
     import com.example.bcntransit.BCNTransitApp.Screens.settings.AboutScreen
     import com.example.bcntransit.BCNTransitApp.Screens.settings.PrivacyPolicyScreen
@@ -45,7 +44,6 @@
     fun BCNTransitApp() {
         val navController = rememberNavController()
         val registerViewModel: RegisterViewModel = viewModel()
-        val currentUserId = getAndroidId(LocalContext.current)
 
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -65,7 +63,7 @@
         )
 
         LaunchedEffect(Unit) {
-            registerViewModel.registerUser(currentUserId)
+            registerViewModel.registerUser()
         }
 
         Scaffold(

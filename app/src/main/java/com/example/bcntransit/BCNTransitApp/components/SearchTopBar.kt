@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.NorthWest // Flecha para rellenar
+import androidx.compose.material.icons.filled.NorthWest
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,12 +18,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.api.ApiClient
 import com.bcntransit.app.model.transport.NearbyStation
-import com.bcntransit.app.util.getAndroidId
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -39,18 +37,15 @@ fun SearchTopBar(
     var query by remember { mutableStateOf(initialQuery) }
     var active by remember { mutableStateOf(false) }
 
-    // Resultados de búsqueda (Objetos complejos)
     var isSearching by remember { mutableStateOf(false) }
     var noResults by remember { mutableStateOf(false) }
     var stations by remember { mutableStateOf<List<NearbyStation>>(emptyList()) }
 
-    // Historial (Strings simples) -> CAMBIO DE TIPO AQUÍ
     var searchHistory by remember { mutableStateOf<List<String>>(emptyList()) }
     var isLoadingHistory by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val suggestions = remember(query, stations) { stations.take(20) }
-    val currentUserId = getAndroidId(LocalContext.current)
 
     // 1. Búsqueda en tiempo real (Sigue igual)
     LaunchedEffect(Unit) {
@@ -59,8 +54,7 @@ fun SearchTopBar(
             .collectLatest { q ->
                 if (q.isNotBlank() && q.length >= 3) {
                     isSearching = true
-                    // Asumo que esta llamada devuelve List<NearbyStation>
-                    stations = ApiClient.resultsApiService.getResultsByName(q, currentUserId)
+                    stations = ApiClient.resultsApiService.getResultsByName(q)
                     noResults = stations.isEmpty()
                     isSearching = false
                 } else {
@@ -76,7 +70,7 @@ fun SearchTopBar(
         if (active && query.isBlank()) {
             isLoadingHistory = true
             try {
-                val rawHistory = ApiClient.resultsApiService.getSearchHistory(currentUserId)
+                val rawHistory = ApiClient.resultsApiService.getSearchHistory()
                 searchHistory = rawHistory
             } catch (e: Exception) {
                 searchHistory = emptyList()

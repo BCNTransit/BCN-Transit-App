@@ -40,7 +40,6 @@ fun StationItem(
     isLast: Boolean,
     lineColor: Color,
     lineType: String,
-    currentUserId: String,
     onClick: () -> Unit
 ) {
     val circleSize = 20.dp
@@ -52,7 +51,7 @@ fun StationItem(
     var isLoadingFavorite by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    LaunchedEffect(station.code, currentUserId) {
+    LaunchedEffect(station.code) {
         try {
             isFavorite = ApiClient.userApiService.userHasFavorite(
                 type = lineType,
@@ -137,7 +136,6 @@ fun StationItem(
                             isLoadingFavorite = true
                             ApiClient.userApiService.addUserFavorite(
                                 favorite = FavoriteDto(
-                                        USER_ID = currentUserId,
                                         TYPE = lineType,
                                         LINE_CODE = station.line_code,
                                         LINE_NAME = station.line_name,

@@ -145,4 +145,6 @@
     <string name="route_back_to_list">Tornar a la llista</string>
     <string name="show_more">Veure més</string>
     <string name="show_less">Veure menys</string>
+    <string name="favorites_empty_title">Encara no tens favorits</string>
+    <string name="favorites_empty_body">Cerca les teves línies o parades freqüents i prem l\'estrella per desar-les aquí.</string>
 </resources>

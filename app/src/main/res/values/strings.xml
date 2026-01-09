@@ -143,4 +143,6 @@
     <string name="route_back_to_list">Volver a la lista</string>
     <string name="show_more">Ver más</string>
     <string name="show_less">Ver menos</string>
+    <string name="favorites_empty_title">Aún no tienes favoritos</string>
+    <string name="favorites_empty_body">Busca tus líneas o paradas frecuentes y pulsa la estrella para guardarlas aquí.</string>
 </resources>

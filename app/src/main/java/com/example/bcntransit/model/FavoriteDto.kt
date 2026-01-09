@@ -1,7 +1,6 @@
 package com.bcntransit.app.model
 
 data class FavoriteDto(
-    val USER_ID: String,
     val TYPE: String,
     val STATION_CODE: String,
     val STATION_NAME: String,

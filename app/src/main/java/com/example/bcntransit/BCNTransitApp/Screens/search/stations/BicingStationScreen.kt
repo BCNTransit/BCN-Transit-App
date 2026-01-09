@@ -56,7 +56,6 @@ fun BicingStationScreen(
         }
     )
 
-    val currentUserId = getAndroidId(LocalContext.current)
     val station by viewModel.stationState.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
@@ -66,7 +65,7 @@ fun BicingStationScreen(
     var isFavorite by remember { mutableStateOf(false) }
     var isLoadingFavorite by remember { mutableStateOf(false) }
 
-    LaunchedEffect(station, currentUserId) {
+    LaunchedEffect(station) {
         if (station != null) {
             try {
                 isFavorite = ApiClient.userApiService.userHasFavorite(
@@ -161,7 +160,6 @@ fun BicingStationScreen(
                                                 } else {
                                                     ApiClient.userApiService.addUserFavorite(
                                                         favorite = FavoriteDto(
-                                                            USER_ID = currentUserId,
                                                             TYPE = TransportType.BICING.type,
                                                             LINE_CODE = "BICING",
                                                             LINE_NAME = "Bicing",

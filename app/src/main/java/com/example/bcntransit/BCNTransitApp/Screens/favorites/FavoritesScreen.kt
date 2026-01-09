@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarOutline // Asegúrate de tener acceso a los iconos extendidos o usa filled con tint
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,11 +16,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.model.FavoriteDto
 import com.bcntransit.app.api.ApiClient
-import com.bcntransit.app.util.getAndroidId
+import com.bcntransit.app.util.getUserId
 import com.example.bcntransit.BCNTransitApp.Screens.favorites.FavoriteItem
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 import kotlinx.coroutines.launch
@@ -28,10 +30,9 @@ import kotlinx.coroutines.launch
 fun FavoritesScreen(
     onFavoriteSelected: (FavoriteDto) -> Unit
 ) {
-
-    val currentUserId = getAndroidId(LocalContext.current)
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var userId = getUserId()
 
     var favorites by remember { mutableStateOf<List<FavoriteDto>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -41,7 +42,7 @@ fun FavoritesScreen(
     val connectionError = stringResource(R.string.connection_error)
     val deleteFavoriteError = stringResource(R.string.delete_favorite_error)
 
-    LaunchedEffect(currentUserId) {
+    LaunchedEffect(userId) {
         loading = true
         error = null
         try {
@@ -77,7 +78,8 @@ fun FavoritesScreen(
                 onBackClick = { },
                 showBackButton = false
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -86,70 +88,116 @@ fun FavoritesScreen(
                 .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
             when {
-                loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = colorResource(R.color.medium_red))
+                loading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = colorResource(R.color.medium_red))
+                    }
                 }
-                error != null -> Text("Error: $error", color = Color.Red, modifier = Modifier.padding(16.dp))
-                else -> LazyColumn(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    item {
-                        Text(
-                            text = stringResource(R.string.favorites_description),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                error != null -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Error: $error", color = Color.Red, modifier = Modifier.padding(16.dp))
+                    }
+                }
+                favorites.isEmpty() -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(100.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
                         )
 
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Text(
+                            text = stringResource(R.string.favorites_empty_title),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = stringResource(R.string.favorites_empty_body),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-                    val groupedFavorites = favorites.groupBy { it.TYPE }
-                    groupedFavorites.forEach { (type, favoritesOfType) ->
+                }
+                // --- ESTADO NORMAL: LISTA CON DATOS ---
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
                         item {
                             Text(
-                                text = type.replaceFirstChar { it.uppercase() },
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                text = stringResource(R.string.favorites_description),
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 16.dp)
                             )
                         }
 
-                        itemsIndexed(
-                            items = favoritesOfType,
-                            key = { _, fav -> "${fav.TYPE}_${fav.STATION_CODE}" }
-                        ) { _, fav ->
-                            FavoriteItem(
-                                fav = fav,
-                                onClick = { onFavoriteSelected(fav) },
-                                onDelete = {
-                                    coroutineScope.launch {
-                                        try {
-                                            loading = true
+                        val groupedFavorites = favorites.groupBy { it.TYPE }
 
-                                            val deleted = ApiClient.userApiService.deleteUserFavorite(
-                                                fav.TYPE,
-                                                fav.STATION_CODE
-                                            )
+                        groupedFavorites.forEach { (type, favoritesOfType) ->
+                            item {
+                                Text(
+                                    text = type.replaceFirstChar { it.uppercase() },
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                            }
 
-                                            if (deleted) {
-                                                favorites = ApiClient.userApiService.getUserFavorites()
+                            itemsIndexed(
+                                items = favoritesOfType,
+                                key = { _, fav -> "${fav.TYPE}_${fav.STATION_CODE}" }
+                            ) { _, fav ->
+                                FavoriteItem(
+                                    fav = fav,
+                                    onClick = { onFavoriteSelected(fav) },
+                                    onDelete = {
+                                        coroutineScope.launch {
+                                            try {
+                                                // Nota: Pequeño fix UX, ponemos loading true solo si quieres bloquear la UI
+                                                // o usamos un estado local para el item, pero global está bien por ahora.
+                                                loading = true
+
+                                                val deleted = ApiClient.userApiService.deleteUserFavorite(
+                                                    fav.TYPE,
+                                                    fav.STATION_CODE
+                                                )
+
+                                                if (deleted) {
+                                                    // Actualizamos la lista
+                                                    favorites = ApiClient.userApiService.getUserFavorites()
+                                                    snackbarHostState.showSnackbar(favoriteDeleted)
+                                                } else {
+                                                    snackbarHostState.showSnackbar(deleteFavoriteError)
+                                                }
+                                            } catch (e: Exception) {
+                                                snackbarHostState.showSnackbar(connectionError)
+                                            } finally {
                                                 loading = false
-                                                snackbarHostState.showSnackbar(favoriteDeleted)
-                                            } else {
-                                                loading = false
-                                                snackbarHostState.showSnackbar(deleteFavoriteError)
                                             }
-                                        } catch (e: Exception) {
-                                            loading = false
-                                            snackbarHostState.showSnackbar(connectionError)
                                         }
                                     }
-                                }
-                            )
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(24.dp))
+                                )
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
                         }
                     }
                 }
@@ -157,5 +205,3 @@ fun FavoritesScreen(
         }
     }
 }
-
-

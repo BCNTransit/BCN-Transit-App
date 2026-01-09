@@ -9,21 +9,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class RegisterViewModel : ViewModel() {
-    fun registerUser(androidId: String) {
+    fun registerUser() {
         viewModelScope.launch {
             try {
                 val fcmToken = FirebaseMessaging.getInstance().token.await()
                 val body = mapOf(
                     "fcmToken" to fcmToken
                 )
-
-                val response = ApiClient.userApiService.registerUser(body)
-
-                if (response) {
-                    Log.d("UserRegister", "User registered successfully: androidId=$androidId")
-                } else {
-                    Log.w("UserRegister", "User already exists or token updated: androidId=$androidId")
-                }
+                ApiClient.userApiService.registerUser(body)
 
             } catch (e: retrofit2.HttpException) {
                 Log.e("UserRegister", "HTTP error: ${e.code()} - ${e.message()}")

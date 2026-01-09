@@ -26,8 +26,7 @@ data class SettingsState(
 )
 
 class SettingsViewModel(
-    private val context: Context,
-    private val androidId: String
+    private val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
@@ -93,13 +92,12 @@ class SettingsViewModel(
 }
 
 class SettingsViewModelFactory(
-    private val context: Context,
-    private val androidId: String
+    private val context: Context
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
-            return SettingsViewModel(context, androidId) as T
+            return SettingsViewModel(context) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

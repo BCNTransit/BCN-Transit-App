@@ -146,4 +146,6 @@
     <string name="route_back_to_list">Back to the list</string>
     <string name="show_more">Show more</string>
     <string name="show_less">Show less</string>
+    <string name="favorites_empty_title">No favorites yet</string>
+    <string name="favorites_empty_body">Search for your frequent lines or stops and tap the star to save them here.</string>
 </resources>

@@ -41,7 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bcntransit.app.R
 import com.bcntransit.app.ui.theme.AppThemeMode
 import com.bcntransit.app.util.LanguageManager
-import com.bcntransit.app.util.getAndroidId
+import com.bcntransit.app.util.getUserId
 import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModel
 import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModelFactory
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
@@ -60,21 +60,22 @@ fun SettingsScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val idCopied = stringResource(R.string.id_copied)
+    val userId = getUserId()
 
     val viewModel: SettingsViewModel = viewModel(
-        factory = SettingsViewModelFactory(context, getAndroidId(context))
+        factory = SettingsViewModelFactory(context)
     )
     val state by viewModel.state.collectAsState()
 
     var isRestarting by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
-    var showThemeDialog by remember { mutableStateOf(false) } // Nuevo estado para diálogo de tema
+    var showThemeDialog by remember { mutableStateOf(false) }
 
     val currentLangCode = remember { LanguageManager.getSavedLanguage(context) }
 
     fun copyIdToClipboard() {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Device ID", getAndroidId(context))
+        val clip = ClipData.newPlainText("Device ID", userId)
         clipboard.setPrimaryClip(clip)
         Toast.makeText(context, idCopied, Toast.LENGTH_SHORT).show()
     }
@@ -87,10 +88,10 @@ fun SettingsScreen(
     }
 
     // Texto para mostrar la selección actual
-    val currentThemeName = when (state.themeMode) { // Asume que state tiene themeMode
+    val currentThemeName = when (state.themeMode) {
         AppThemeMode.LIGHT -> stringResource(R.string.theme_light)
         AppThemeMode.DARK -> stringResource(R.string.theme_dark)
-        else -> stringResource(R.string.theme_light) // Default a Light si es null o System
+        else -> stringResource(R.string.theme_light)
     }
 
     if (isRestarting) {
@@ -143,7 +144,6 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
 
-            // --- SECCIÓN 1: GENERAL ---
             SettingsSectionHeader(title = stringResource(R.string.settings_notifications))
 
             SettingsSwitchItem(
@@ -156,7 +156,6 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
-            // --- SECCIÓN 2: PREFERENCIAS ---
             SettingsSectionHeader(title = stringResource(R.string.settings_preferences))
 
             SettingsNavigationItem(
@@ -168,7 +167,6 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
-            // NUEVO ITEM: TEMA
             SettingsNavigationItem(
                 icon = Icons.Outlined.Palette,
                 title = stringResource(R.string.settings_theme),
@@ -178,7 +176,6 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
-            // --- SECCIÓN 3: INFORMACIÓN ---
             SettingsSectionHeader(title = stringResource(R.string.settings_information))
 
             SettingsNavigationItem(
@@ -201,7 +198,6 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- FOOTER (ID & Versión) ---
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -222,7 +218,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = getAndroidId(context),
+                            text = userId,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace

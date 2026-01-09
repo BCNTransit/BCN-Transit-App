@@ -71,7 +71,6 @@ fun RoutesScreen(
         }
     )
 
-    val currentUserId = getAndroidId(LocalContext.current)
     val routesState by viewModel.routesState.collectAsState()
     val connectionsState by viewModel.stationConnectionsState.collectAsState()
     val accessesState by viewModel.stationAccessesState.collectAsState()
@@ -95,7 +94,7 @@ fun RoutesScreen(
         }
         return
     } else {
-        LaunchedEffect(selectedStation!!.code, currentUserId) {
+        LaunchedEffect(selectedStation!!.code) {
             try {
                 isFavorite = ApiClient.userApiService.userHasFavorite(
                     type = selectedStation!!.transport_type,
@@ -193,7 +192,6 @@ fun RoutesScreen(
                                                     isLoadingFavorite = true
                                                     ApiClient.userApiService.addUserFavorite(
                                                         favorite = FavoriteDto(
-                                                            USER_ID = currentUserId,
                                                             TYPE = selectedStation!!.transport_type,
                                                             LINE_CODE = selectedStation!!.line_code,
                                                             LINE_NAME = selectedStation!!.line_name,

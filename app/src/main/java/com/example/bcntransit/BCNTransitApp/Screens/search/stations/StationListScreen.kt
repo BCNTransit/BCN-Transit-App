@@ -27,7 +27,6 @@ import com.bcntransit.app.R
 import com.bcntransit.app.api.ApiService
 import com.bcntransit.app.model.transport.StationDto
 import com.bcntransit.app.data.enums.TransportType
-import com.bcntransit.app.util.getAndroidId
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -49,7 +48,6 @@ fun StationListScreen(
             }
         }
     )
-    val currentUserId = getAndroidId(LocalContext.current)
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf(stringResource(R.string.list), stringResource(R.string.menu_map))
@@ -195,7 +193,6 @@ fun StationListScreen(
                                             isLast = index == showStations.lastIndex,
                                             lineColor = parsedColor,
                                             lineType = line.transport_type,
-                                            currentUserId = currentUserId,
                                             onClick = { onStationClick(station) }
                                         )
                                     }

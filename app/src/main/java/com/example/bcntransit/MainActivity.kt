@@ -17,7 +17,6 @@ import com.bcntransit.app.ui.theme.BCNTransitTheme
 import com.bcntransit.app.util.LanguageManager
 import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModelFactory
 import org.maplibre.android.MapLibre
-import com.bcntransit.app.util.getAndroidId
 import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModel
 
 class MainActivity : ComponentActivity() {
@@ -40,8 +39,7 @@ class MainActivity : ComponentActivity() {
 
         MapLibre.getInstance(this)
 
-        val androidId = getAndroidId(this)
-        val factory = SettingsViewModelFactory(applicationContext, androidId)
+        val factory = SettingsViewModelFactory(applicationContext)
         val settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
 
         setContent {
