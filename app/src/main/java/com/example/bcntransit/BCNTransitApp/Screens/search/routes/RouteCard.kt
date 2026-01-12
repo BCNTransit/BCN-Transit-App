@@ -41,6 +41,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,23 +68,31 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
         ) {
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(12.dp)
                     .animateContentSize()
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     val drawableName = "${route.line_type}_${route.line_name.lowercase().replace(" ", "_")}"
                     val drawableId = remember(route.line_name) {
                         context.resources.getIdentifier(drawableName, "drawable", context.packageName)
                     }
 
                     if (drawableId != 0) {
-                        Icon(painter = painterResource(drawableId), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(38.dp))
+                        Icon(
+                            painter = painterResource(drawableId),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(42.dp)
+                        )
                     } else {
                         val routeColor = remember(route.color) { parseColorSafe(route.color) }
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .size(38.dp)
+                                .size(42.dp)
                                 .clip(CircleShape)
                                 .background(routeColor)
                         ) {
@@ -99,15 +108,45 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(stringResource(R.string.routes_direction), style = MaterialTheme.typography.labelSmall)
-                        Text(if(drawableId == 0) "${route.line_name} - ${route.destination}" else route.destination,
-                            style = MaterialTheme.typography.titleLarge)
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            stringResource(R.string.routes_direction),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = if (drawableId == 0) "${route.line_name} - ${route.destination}" else route.destination,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Normal,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    val firstTrip = route.next_trips.firstOrNull()
+                    if (!firstTrip?.platform.isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        androidx.compose.material3.Surface(
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "Vía ${firstTrip.platform}",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 if (isLoading) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -119,90 +158,6 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                 } else {
                     val limit = if (isExpanded) 5 else 2
                     val visibleTrips = route.next_trips.take(limit)
-
-                    /*visibleTrips.forEachIndexed { index, trip ->
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Box(
-                                modifier = Modifier.size(24.dp).background(color = colorResource(R.color.next_arrival_background), shape = CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text((index+1).toString(), style = MaterialTheme.typography.bodyMedium, color = colorResource(R.color.next_arrival_text))
-                            }
-
-                            Spacer(modifier = Modifier.width(12.dp))
-                            ArrivalCountdown(arrivalEpochSeconds = trip.arrival_time, index)
-
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(buildString { if (!trip.platform.isNullOrEmpty()) append("Vía: ${trip.platform}") },
-                                style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                        }
-
-                        if (trip.delay_in_minutes != 0) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 2.dp)
-                            ) {
-                                Spacer(modifier = Modifier.width(48.dp))
-
-                                val formatter = remember {
-                                    SimpleDateFormat("HH:mm", Locale.getDefault())
-                                }
-
-                                val realTime = Date(trip.arrival_time * 1000)
-                                val plannedTime = Date((trip.arrival_time - trip.delay_in_minutes * 60) * 1000)
-
-                                val plannedStr = formatter.format(plannedTime) + "h"
-                                val realStr = formatter.format(realTime) + "h"
-
-                                val delaySign = if (trip.delay_in_minutes > 0) "+" else ""
-                                val delayStr = " ($delaySign${trip.delay_in_minutes} min)"
-
-                                val delayColor = if (trip.delay_in_minutes > 0) {
-                                    colorResource(R.color.medium_red)
-                                } else {
-                                    colorResource(R.color.dark_green)
-                                }
-
-                                Text(
-                                    text = buildAnnotatedString {
-                                        withStyle(
-                                            style = SpanStyle(
-                                                textDecoration = TextDecoration.LineThrough,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        ) {
-                                            append(plannedStr)
-                                        }
-
-                                        append(" → ")
-
-                                        withStyle(
-                                            style = SpanStyle(
-                                                color = MaterialTheme.colorScheme.onBackground
-                                            )
-                                        ) {
-                                            append(realStr)
-                                        }
-
-                                        withStyle(
-                                            style = SpanStyle(
-                                                color = delayColor
-                                            )
-                                        ) {
-                                            append(delayStr)
-                                        }
-                                    },
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(12.dp))
-                        } else {
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-                    }*/
 
                     val hasAnyDelay = visibleTrips.any { it.delay_in_minutes != 0 }
                     if (!hasAnyDelay) {
@@ -230,7 +185,6 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                                 }
                             }
                         }
-                        //Spacer(modifier = Modifier.height(4.dp))
 
                     } else {
                         // --- DETAILED MODE ---
@@ -260,7 +214,7 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
                                     val realStr = formatter.format(realTime) + "h"
                                     val delaySign = if (trip.delay_in_minutes > 0) "+" else ""
                                     val delayStr = " ($delaySign${trip.delay_in_minutes} min)"
-                                    val delayColor = if (trip.delay_in_minutes > 0) colorResource(R.color.medium_red) else colorResource(R.color.dark_green)
+                                    val delayColor = if (trip.delay_in_minutes > 0) MaterialTheme.colorScheme.primary else colorResource(R.color.dark_green)
 
                                     Text(
                                         text = buildAnnotatedString {
@@ -318,8 +272,6 @@ fun RouteCard(route: RouteDto, isLoading: Boolean) {
 @Composable
 fun TripBasicInfo(trip: NextTripDto, index: Int) {
     Row(verticalAlignment = Alignment.Bottom) {
-
-        // Círculo con número
         Box(
             modifier = Modifier
                 .size(24.dp)
@@ -336,17 +288,13 @@ fun TripBasicInfo(trip: NextTripDto, index: Int) {
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        ArrivalCountdown(arrivalEpochSeconds = trip.arrival_time, index)
-
-        if (!trip.platform.isNullOrEmpty()) {
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Vía: ${trip.platform}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1
-            )
-        }
+        ArrivalCountdown(
+            arrivalEpochSeconds = trip.arrival_time,
+            style = MaterialTheme.typography.titleLarge,
+            showSeconds = index == 0,
+            isBold = index == 0,
+            isWarning = index == 0
+        )
     }
 }
 

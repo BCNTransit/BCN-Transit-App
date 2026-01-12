@@ -75,11 +75,15 @@ import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.Settings
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.bcntransit.app.ui.theme.AppThemeMode
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     onViewLine: (String, String) -> Unit,
-    onViewStation: (String, String, String) -> Unit
+    onViewStation: (String, String, String) -> Unit,
+    appThemeMode: AppThemeMode
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -104,7 +108,8 @@ fun MapScreen(
     } else {
         MapContent(
             onViewLine = onViewLine,
-            onViewStation = onViewStation
+            onViewStation = onViewStation,
+            appThemeMode = appThemeMode
         )
     }
 }
@@ -195,7 +200,8 @@ fun NoLocationPermissionScreen(context: Context) {
 @Composable
 fun MapContent(
     onViewLine: (String, String) -> Unit,
-    onViewStation: (String, String, String) -> Unit
+    onViewStation: (String, String, String) -> Unit,
+    appThemeMode: AppThemeMode
 ) {
     val context = LocalContext.current
 
@@ -210,7 +216,9 @@ fun MapContent(
         }
     )
     val selectedFilters by viewModel.selectedFilters.collectAsState()
-    val mapView = rememberMapView(context)
+    val isLightMode = (appThemeMode == AppThemeMode.LIGHT || (appThemeMode == AppThemeMode.SYSTEM && !isSystemInDarkTheme()))
+
+    val mapView = rememberMapView(context, appThemeMode)
     DisposableEffect(mapView) {
         mapView.onStart()
         mapView.onResume()
@@ -432,8 +440,8 @@ fun MapContent(
                                     .withTextField(displayText)
                                     .withTextOffset(arrayOf(0f, 2.2f))
                                     .withTextSize(10f)
-                                    .withTextColor("#333333")
-                                    .withTextHaloColor("#FFFFFF")
+                                    .withTextColor(if (isLightMode) "#333333" else "#FFFFFF")
+                                    .withTextHaloColor(if (isLightMode) "#FFFFFF" else "#333333")
                                     .withTextHaloWidth(2f)
                                     .withTextAnchor("top")
 
@@ -574,12 +582,12 @@ fun MapContent(
                                     )
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                                     containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                                 ),
                                 border = FilterChipDefaults.filterChipBorder(
                                     borderColor = if (selectedFilters.contains(filter))
-                                        MaterialTheme.colorScheme.primary
+                                        MaterialTheme.colorScheme.surfaceContainer
                                     else
                                         Color.Transparent,
                                     selectedBorderColor = MaterialTheme.colorScheme.primary,
@@ -1298,20 +1306,37 @@ private fun BottomSheetContent(
 
 
 @Composable
-fun rememberMapView(context: Context): MapView {
+fun rememberMapView(
+    context: Context,
+    appTheme: AppThemeMode
+): MapView {
+
+    val isSystemDark = isSystemInDarkTheme()
+    val useDarkStyle = remember(appTheme, isSystemDark) {
+        when (appTheme) {
+            AppThemeMode.LIGHT -> false
+            AppThemeMode.DARK -> true
+            AppThemeMode.SYSTEM -> isSystemDark
+        }
+    }
+
+    val mapStyleUrl = if (useDarkStyle) {
+        "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+    } else {
+        "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+    }
+
     val mapView = remember {
         MapView(context).apply {
             onCreate(null)
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(mapStyleUrl) {
         mapView.getMapAsync { map ->
-            map.setStyle(
-                Style.Builder().fromUri(
-                    "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
-                )
-            ) { style ->
+            map.setStyle(Style.Builder().fromUri(mapStyleUrl)) { style ->
+
+                // Configuración del LocationComponent (se reinicia al cambiar estilo)
                 if (hasLocationPermission(context)) {
                     val locationComponent = map.locationComponent
                     val options = LocationComponentActivationOptions.builder(context, style)
@@ -1322,6 +1347,7 @@ fun rememberMapView(context: Context): MapView {
                     locationComponent.cameraMode = CameraMode.TRACKING
                     locationComponent.renderMode = RenderMode.COMPASS
                 }
+
                 map.uiSettings.apply {
                     isScrollGesturesEnabled = true
                     isZoomGesturesEnabled = true

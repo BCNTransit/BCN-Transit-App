@@ -9,16 +9,9 @@
     </style>
 
     <style name="Theme.BCNTransit.Splash" parent="Theme.SplashScreen">
-        <!-- Color que se ve detrás del icono -->
-        <item name="windowSplashScreenBackground">@color/splash_background</item>
-
-        <!-- Icono centrado mientras carga -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/trace</item>
-
-        <!-- Duración opcional de la animación -->
-        <item name="windowSplashScreenAnimationDuration">5000</item>
-
-        <!-- Tema que tendrá la actividad después del splash -->
+        <item name="windowSplashScreenBackground">@color/splash_background_light</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
         <item name="postSplashScreenTheme">@style/Theme.BCNTransit</item>
     </style>
 </resources>

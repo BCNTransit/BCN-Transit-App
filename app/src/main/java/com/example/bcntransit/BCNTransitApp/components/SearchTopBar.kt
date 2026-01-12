@@ -1,15 +1,13 @@
-import androidx.compose.material3.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.NorthWest
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.NorthWest
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Train
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bcntransit.app.R
 import com.bcntransit.app.api.ApiClient
@@ -45,18 +45,26 @@ fun SearchTopBar(
     var isLoadingHistory by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
-    val suggestions = remember(query, stations) { stations.take(20) }
+    val suggestions = remember(stations) { stations.take(20) }
 
-    // 1. Búsqueda en tiempo real (Sigue igual)
+    val brandColor = MaterialTheme.colorScheme.primary
+
+    // 1. Lógica de Búsqueda
     LaunchedEffect(Unit) {
         snapshotFlow { query }
             .debounce(300)
             .collectLatest { q ->
                 if (q.isNotBlank() && q.length >= 3) {
                     isSearching = true
-                    stations = ApiClient.resultsApiService.getResultsByName(q)
-                    noResults = stations.isEmpty()
-                    isSearching = false
+                    try {
+                        stations = ApiClient.resultsApiService.getResultsByName(q)
+                        noResults = stations.isEmpty()
+                    } catch (e: Exception) {
+                        stations = emptyList()
+                        noResults = true
+                    } finally {
+                        isSearching = false
+                    }
                 } else {
                     stations = emptyList()
                     noResults = false
@@ -65,13 +73,11 @@ fun SearchTopBar(
             }
     }
 
-    // 2. Cargar historial (Strings)
     LaunchedEffect(active) {
         if (active && query.isBlank()) {
             isLoadingHistory = true
             try {
-                val rawHistory = ApiClient.resultsApiService.getSearchHistory()
-                searchHistory = rawHistory
+                searchHistory = ApiClient.resultsApiService.getSearchHistory()
             } catch (e: Exception) {
                 searchHistory = emptyList()
             } finally {
@@ -80,15 +86,12 @@ fun SearchTopBar(
         }
     }
 
-    if(enabled) {
+    if (enabled) {
         SearchBar(
             query = query,
             onQueryChange = { if (enabled) query = it },
-            onSearch = {}, // El enter del teclado podría disparar algo aquí si quisieras
+            onSearch = {},
             active = active,
-            colors = SearchBarDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
-            ),
             onActiveChange = { isActive ->
                 if (enabled) {
                     active = isActive
@@ -97,40 +100,52 @@ fun SearchTopBar(
                 }
             },
             enabled = enabled,
+            tonalElevation = 0.dp,
+            shadowElevation = if (active) 0.dp else 6.dp,
+            colors = SearchBarDefaults.colors(
+                containerColor = if (active) {
+                    MaterialTheme.colorScheme.surfaceContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainerHigh
+                },
+                dividerColor = Color.Transparent,
+                inputFieldColors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ),
             leadingIcon = {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(colorResource(R.color.red), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = if (query.isEmpty() && active) Icons.Default.History else Icons.Default.Search,
-                        contentDescription = "Buscar",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Icon(
+                    imageVector = if (query.isEmpty() && active) Icons.Rounded.History else Icons.Rounded.Search,
+                    contentDescription = "Buscar",
+                    tint = brandColor
+                )
             },
             placeholder = {
-                Text(stringResource(R.string.map_search_station))
+                Text(
+                    text = stringResource(R.string.map_search_station),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .then(if (!active) Modifier.padding(horizontal = 16.dp, vertical = 8.dp) else Modifier)
+                .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 8.dp)
         ) {
-
             if (isSearching) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().padding(12.dp)) {
-                    CircularProgressIndicator(color = colorResource(R.color.medium_red))
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = brandColor)
                 }
             }
             else if (query.isNotBlank()) {
-                // --- MODO RESULTADOS (Objetos NearbyStation) ---
-                if (stations.isEmpty()) {
-                    if (noResults) {
-                        Text("No se encontraron coincidencias.", modifier = Modifier.padding(16.dp))
-                    }
+                if (stations.isEmpty() && noResults) {
+                    EmptyStateMessage(
+                        icon = Icons.Rounded.Search,
+                        message = "No hemos encontrado estaciones con ese nombre."
+                    )
                 } else {
                     ResultsList(
                         items = suggestions,
@@ -150,25 +165,19 @@ fun SearchTopBar(
                 }
             }
             else {
-                // --- MODO HISTORIAL (Strings) ---
                 if (isLoadingHistory) {
-                    Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.Gray)
+                    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.outline)
                     }
                 } else if (searchHistory.isNotEmpty()) {
-                    Column {
-                        SimpleHistoryList(
-                            historyItems = searchHistory,
-                            onHistoryClick = { historyText ->
-                                query = historyText
-                            }
-                        )
-                    }
+                    SimpleHistoryList(
+                        historyItems = searchHistory,
+                        onHistoryClick = { historyText -> query = historyText }
+                    )
                 } else {
-                    Text(
-                        text = "Puedes escribir el nombre completo o parcial del elemento que buscas, o introducir su identificador numérico si lo conoces.",
-                        modifier = Modifier.padding(16.dp),
-                        color = Color.Gray
+                    EmptyStateMessage(
+                        icon = Icons.Rounded.Train,
+                        message = "Busca por nombre de parada, línea o código numérico."
                     )
                 }
             }
@@ -176,46 +185,54 @@ fun SearchTopBar(
     }
 }
 
-// --- NUEVO COMPONENTE PARA PINTAR STRINGS ---
+
 @Composable
 fun SimpleHistoryList(
     historyItems: List<String>,
     onHistoryClick: (String) -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth().heightIn(max = 1200.dp)
+        modifier = Modifier.fillMaxWidth().imePadding(),
+        contentPadding = PaddingValues(vertical = 8.dp)
     ) {
+        item {
+            Text(
+                text = "Búsquedas recientes",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+            )
+        }
         items(historyItems) { text ->
             ListItem(
                 headlineContent = {
                     Text(
                         text = text,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 leadingContent = {
                     Icon(
-                        imageVector = Icons.Default.History,
+                        imageVector = Icons.Rounded.History,
                         contentDescription = null,
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 trailingContent = {
-                    Icon(
-                        imageVector = Icons.Default.NorthWest,
-                        contentDescription = "Usar",
-                        tint = Color.LightGray,
-                        modifier = Modifier.size(16.dp)
-                    )
+                    IconButton(onClick = { onHistoryClick(text) }) {
+                        Icon(
+                            imageVector = Icons.Rounded.NorthWest,
+                            contentDescription = "Rellenar",
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onHistoryClick(text) }
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                thickness = DividerDefaults.Thickness,
-                color = DividerDefaults.color.copy(alpha = 0.2f)
+                    .clickable { onHistoryClick(text) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             )
         }
     }
@@ -227,35 +244,80 @@ fun ResultsList(
     enabled: Boolean,
     onItemClick: (NearbyStation) -> Unit
 ) {
-    LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 1200.dp)) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().imePadding(),
+        contentPadding = PaddingValues(vertical = 8.dp)
+    ) {
         items(items) { station ->
             ListItem(
                 headlineContent = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        val context = LocalContext.current
-                        val drawableName = "${station.type}_${station.line_name?.lowercase()?.replace(" ", "_")}"
-                        val drawableId = remember(station.line_name) {
-                            context.resources.getIdentifier(drawableName, "drawable", context.packageName)
-                                .takeIf { it != 0 }
-                                ?: context.resources.getIdentifier(station.type, "drawable", context.packageName)
-                        }
-
-                        Icon(
-                            painter = painterResource(drawableId),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Text(text = station.station_name, style = MaterialTheme.typography.bodyLarge)
-                            Text(text = "(${station.station_code})", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                        }
-                    }
+                    Text(
+                        text = station.station_name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 },
-                modifier = Modifier.fillMaxWidth().clickable(enabled = enabled) { onItemClick(station) }
+                supportingContent = {
+                    Text(
+                        text = "Código: ${station.station_code}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                leadingContent = {
+                    val context = LocalContext.current
+                    val drawableName = "${station.type}_${station.line_name?.lowercase()?.replace(" ", "_")}"
+                    val drawableId = remember(station.line_name) {
+                        context.resources.getIdentifier(drawableName, "drawable", context.packageName)
+                            .takeIf { it != 0 }
+                            ?: context.resources.getIdentifier(station.type, "drawable", context.packageName)
+                    }
+
+                    Icon(
+                        painter = painterResource(drawableId),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(32.dp)
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = enabled) { onItemClick(station) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = DividerDefaults.Thickness, color = DividerDefaults.color.copy(alpha = 0.5f))
+
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 72.dp, end = 16.dp),
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
         }
+    }
+}
+
+@Composable
+fun EmptyStateMessage(icon: androidx.compose.ui.graphics.vector.ImageVector, message: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.outlineVariant,
+            modifier = Modifier.size(48.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
     }
 }

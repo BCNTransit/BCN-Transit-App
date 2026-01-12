@@ -18,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -72,14 +74,19 @@ fun AboutScreen(
             Box(
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .shadow(
+                        elevation = 10.dp,
+                        shape = CircleShape,
+                        spotColor = Color.Black.copy(alpha = 0.4f)
+                    )
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clip(CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.trace),
-                    contentDescription = null,
-                    modifier = Modifier.size(80.dp),
+                    painter = painterResource(id = R.drawable.bcn_transit),
+                    contentDescription = "Logo BCN Transit",
+                    modifier = Modifier.size(130.dp),
                     contentScale = ContentScale.Fit
                 )
             }
@@ -127,12 +134,11 @@ fun AboutScreen(
             ActionCard(
                 title = stringResource(R.string.about_visit_website),
                 icon = Icons.Default.Language,
-                onClick = { openUrl("https://github.com/mg-diego/bcn-transit-app") }
+                onClick = { openUrl("https://github.com/BCNTransit") }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Tarjeta de Rate App
             ActionCard(
                 title = stringResource(R.string.about_rate_app),
                 icon = Icons.Default.StarRate,

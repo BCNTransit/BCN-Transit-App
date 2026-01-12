@@ -170,8 +170,6 @@ fun FavoritesScreen(
                                     onDelete = {
                                         coroutineScope.launch {
                                             try {
-                                                // Nota: Pequeño fix UX, ponemos loading true solo si quieres bloquear la UI
-                                                // o usamos un estado local para el item, pero global está bien por ahora.
                                                 loading = true
 
                                                 val deleted = ApiClient.userApiService.deleteUserFavorite(
@@ -180,7 +178,6 @@ fun FavoritesScreen(
                                                 )
 
                                                 if (deleted) {
-                                                    // Actualizamos la lista
                                                     favorites = ApiClient.userApiService.getUserFavorites()
                                                     snackbarHostState.showSnackbar(favoriteDeleted)
                                                 } else {

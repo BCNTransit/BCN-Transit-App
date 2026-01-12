@@ -24,9 +24,10 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(LanguageManager.wrapContext(newBase))
     }
 
+    private var isReady = false
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Instalar SplashScreen
         //val splashScreen = installSplashScreen()
 
         actionBar?.hide()

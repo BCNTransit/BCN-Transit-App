@@ -1,16 +1,20 @@
 package com.bcntransit.app.screens.search
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -45,7 +49,7 @@ fun BusLinesScreen(
     val context = LocalContext.current
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.surface, // Fondo base
         topBar = {
             CustomTopBar(
                 onBackClick = onBackClick,
@@ -56,9 +60,7 @@ fun BusLinesScreen(
                     ) {
                         val drawableId = remember(TransportType.BUS) {
                             context.resources.getIdentifier(
-                                TransportType.BUS.type,
-                                "drawable",
-                                context.packageName
+                                TransportType.BUS.type, "drawable", context.packageName
                             )
                         }
                         Icon(
@@ -90,7 +92,10 @@ fun BusLinesScreen(
                 }
 
                 errorLines != null -> {
-                    InlineErrorBanner(errorLines!!)
+                    // Añadimos padding al error también para que se alinee
+                    Box(modifier = Modifier.padding(16.dp)) {
+                        InlineErrorBanner(errorLines!!)
+                    }
                 }
 
                 else -> {
@@ -99,30 +104,21 @@ fun BusLinesScreen(
                     }
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         groupedByCategory.forEach { (category, linesInCategory) ->
                             item {
-                                CategoryHeaderFlat(
-                                    title = category,
-                                    count = linesInCategory.size,
+                                BusCategoryCard(
+                                    category = category,
+                                    lines = linesInCategory,
                                     isExpanded = expandedStates[category] == true,
-                                    onToggle = { viewModel.toggleCategory(category) }
+                                    onToggle = { viewModel.toggleCategory(category) },
+                                    onLineClick = onLineClick,
+                                    viewModel = viewModel,
+                                    context = context
                                 )
-                            }
-
-                            if (expandedStates[category] == true) {
-                                item {
-                                    Column(modifier = Modifier.animateContentSize()) {
-                                        linesInCategory.forEach { line ->
-                                            BusLineItem(
-                                                line = line,
-                                                onClick = { onLineClick(line) },
-                                                drawableId = viewModel.mapLineToDrawableId(line, context)
-                                            )
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
@@ -133,39 +129,105 @@ fun BusLinesScreen(
 }
 
 @Composable
-fun CategoryHeaderFlat(
+fun BusCategoryCard(
+    category: String,
+    lines: List<LineDto>,
+    isExpanded: Boolean,
+    onToggle: () -> Unit,
+    onLineClick: (LineDto) -> Unit,
+    viewModel: BusLinesViewModel,
+    context: android.content.Context
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        modifier = Modifier.fillMaxWidth().animateContentSize()
+    ) {
+        Column {
+            CategoryHeaderStyled(
+                title = category,
+                count = lines.size,
+                isExpanded = isExpanded,
+                onToggle = onToggle
+            )
+
+            if (isExpanded) {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                    thickness = 1.dp
+                )
+
+                Column {
+                    lines.forEachIndexed { index, line ->
+                        BusLineItem(
+                            line = line,
+                            onClick = { onLineClick(line) },
+                            drawableId = viewModel.mapLineToDrawableId(line, context)
+                        )
+                        if (index < lines.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoryHeaderStyled(
     title: String,
     count: Int,
     isExpanded: Boolean,
     onToggle: () -> Unit
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f),
+    val rotationState by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        label = "ArrowRotation"
+    )
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onToggle() }
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "$title ($count)",
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
+                color = MaterialTheme.colorScheme.onSurface
             )
+            Text(
+                text = "$count líneas",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(100))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
-                imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = if (isExpanded) "Colapsar" else "Expandir",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                imageVector = Icons.Rounded.ExpandMore,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.rotate(rotationState)
             )
         }
     }
-    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 }
 
 class BusLinesViewModelFactory(

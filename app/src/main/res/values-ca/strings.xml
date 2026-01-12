@@ -26,7 +26,7 @@
     <string name="settings_privacy">Política de privacitat</string>
     <string name="settings_terms_and_conditions">Termes i condicions</string>
     <string name="settings_id">Identificador</string>
-    <string name="version">Versió 1.0</string>
+    <string name="version">Versió 1.0.0</string>
 
     <string name="about_title">Quant a</string>
     <string name="about_description">BCNTransit és el teu company de viatge a Barcelona. Consulta horaris en temps real, rep alertes de servei i localitza les teves estacions preferides de Metro, Bus, Rodalies, FGC i Bicing.</string>
@@ -147,4 +147,5 @@
     <string name="show_less">Veure menys</string>
     <string name="favorites_empty_title">Encara no tens favorits</string>
     <string name="favorites_empty_body">Cerca les teves línies o parades freqüents i prem l\'estrella per desar-les aquí.</string>
+    <string name="routes_line_details_not_available">Detalls no disponibles per a la línia: %1$s</string>
 </resources>

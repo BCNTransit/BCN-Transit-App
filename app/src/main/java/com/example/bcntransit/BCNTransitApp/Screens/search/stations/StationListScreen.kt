@@ -27,6 +27,7 @@ import com.bcntransit.app.R
 import com.bcntransit.app.api.ApiService
 import com.bcntransit.app.model.transport.StationDto
 import com.bcntransit.app.data.enums.TransportType
+import com.bcntransit.app.ui.theme.AppThemeMode
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -36,6 +37,7 @@ fun StationListScreen(
     lineCode: String,
     transportType: TransportType,
     apiService: ApiService,
+    appThemeMode: AppThemeMode,
     onStationClick: (StationDto) -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -216,6 +218,7 @@ fun StationListScreen(
                                     stations = showStations,
                                     lineColor = parsedColor,
                                     modifier = Modifier.fillMaxSize(),
+                                    appThemeMode = appThemeMode,
                                     onStationClick = { onStationClick(it) }
                                 )
                             }

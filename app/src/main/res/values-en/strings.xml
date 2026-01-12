@@ -27,7 +27,7 @@
     <string name="settings_privacy">Privacy Policy</string>
     <string name="settings_terms_and_conditions">Terms and Conditions</string>
     <string name="settings_id">Identifier</string>
-    <string name="version">Version 1.0</string>
+    <string name="version">Version 1.0.0</string>
 
     <string name="about_title">About</string>
     <string name="about_description">BCNTransit is your travel companion in Barcelona. Check real-time schedules, get service alerts, and locate your favorite Metro, Bus, Rodalies, FGC and Bicing stations.</string>
@@ -148,4 +148,5 @@
     <string name="show_less">Show less</string>
     <string name="favorites_empty_title">No favorites yet</string>
     <string name="favorites_empty_body">Search for your frequent lines or stops and tap the star to save them here.</string>
+    <string name="routes_line_details_not_available">Line details not available for: %1$s</string>
 </resources>

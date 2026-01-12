@@ -48,7 +48,6 @@ fun TermsAndConditionsScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // --- HEADER ---
             Icon(
                 imageVector = Icons.Outlined.Description,
                 contentDescription = null,
@@ -67,7 +66,6 @@ fun TermsAndConditionsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Badge de fecha
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(16.dp),
@@ -82,7 +80,6 @@ fun TermsAndConditionsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- INTRODUCCIÓN LEGAL ---
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
@@ -99,8 +96,6 @@ fun TermsAndConditionsScreen(
             }
 
             Spacer(modifier = Modifier.height(32.dp))
-
-            // --- SECCIONES (Mejoradas) ---
 
             TermSection(
                 icon = Icons.Outlined.Warning,
@@ -134,7 +129,6 @@ fun TermsAndConditionsScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Footer
             Text(
                 text = "© $currentYear BCNTransit. Barcelona.",
                 style = MaterialTheme.typography.labelSmall,

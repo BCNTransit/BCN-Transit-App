@@ -103,9 +103,6 @@ fun getMarkerSize(type: String): Int =
         else -> 50
     }
 
-/**
- * Crea y gestiona el ciclo de vida de un MapView para Compose
- */
 @Composable
 fun rememberMapViewWithLifecycle(context: Context): MapView {
     val mapView = remember {

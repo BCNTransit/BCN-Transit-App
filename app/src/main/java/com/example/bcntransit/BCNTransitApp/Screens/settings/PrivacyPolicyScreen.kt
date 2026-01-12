@@ -82,7 +82,6 @@ fun PrivacyPolicyScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Introducción destacada
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
@@ -99,8 +98,6 @@ fun PrivacyPolicyScreen(
             }
 
             Spacer(modifier = Modifier.height(32.dp))
-
-            // --- SECCIONES LEGALES ---
 
             PolicySection(
                 icon = Icons.Outlined.FolderShared,
@@ -150,7 +147,6 @@ fun PrivacyPolicyScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Footer
             Text(
                 text = "© $currentYear BCNTransit. Barcelona.",
                 style = MaterialTheme.typography.labelSmall,

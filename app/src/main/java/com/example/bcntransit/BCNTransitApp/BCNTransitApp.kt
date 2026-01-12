@@ -1,6 +1,8 @@
     package com.bcntransit.app
 
+    import android.annotation.SuppressLint
     import android.os.Build
+    import android.widget.Toast
     import androidx.annotation.RequiresApi
     import androidx.compose.foundation.layout.padding
     import androidx.compose.material3.Scaffold
@@ -37,8 +39,12 @@
     import com.bcntransit.app.widget.RegisterViewModel
     import com.example.bcntransit.BCNTransitApp.Screens.settings.AboutScreen
     import com.example.bcntransit.BCNTransitApp.Screens.settings.PrivacyPolicyScreen
+    import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModel
+    import com.example.bcntransit.BCNTransitApp.Screens.settings.SettingsViewModelFactory
     import com.example.bcntransit.BCNTransitApp.Screens.settings.TermsAndConditionsScreen
+    import kotlinx.coroutines.launch
 
+    @SuppressLint("LocalContextGetResourceValueCall")
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun BCNTransitApp() {
@@ -61,6 +67,10 @@
             Screen.Search.route,
             Screen.Favorites.route,
         )
+
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+
 
         LaunchedEffect(Unit) {
             registerViewModel.registerUser()
@@ -114,6 +124,13 @@
                 }
             }
         ) { padding ->
+            val context = LocalContext.current
+            val settingsViewModel: SettingsViewModel = viewModel(
+                factory = SettingsViewModelFactory(context.applicationContext)
+            )
+            val state = settingsViewModel.state.collectAsState()
+            val appThemeMode = state.value.themeMode
+
             NavHost(
                 navController = navController,
                 startDestination = Screen.Map.route,
@@ -130,7 +147,8 @@
                             navController.navigate(
                                 Screen.SearchStation.viewRoutes(type, lineCode, stationCode)
                             )
-                        }
+                        },
+                        appThemeMode = appThemeMode
                     )
                 }
 
@@ -189,6 +207,7 @@
                         lineCode = lineCodeArg,
                         transportType = TransportType.from(typeArg),
                         apiService = ApiClient.from(transportType),
+                        appThemeMode = appThemeMode,
                         onStationClick = { station: StationDto ->
                             navController.navigate(
                                 Screen.SearchStation.viewRoutes(typeArg, lineCodeArg, station.code)
@@ -216,6 +235,7 @@
                         BicingStationScreen(
                             stationId = stationCodeParam,
                             bicingApiService = ApiClient.bicingApiService,
+                            appThemeMode = appThemeMode,
                             onBackClick = { navController.popBackStack() }
                         )
                     } else {
@@ -223,12 +243,39 @@
                             stationCode = stationCodeParam,
                             lineCode = lineCodeArg,
                             apiService = ApiClient.from(transportType),
+                            appThemeMode = appThemeMode,
                             onConnectionClick = { stationCode: String, lineCode: String ->
                                 navController.navigate(
                                     Screen.SearchStation.viewRoutes(typeArg, lineCode, stationCode)
                                 )
                             },
-                            onBackClick = { navController.popBackStack() }
+                            onBackClick = { navController.popBackStack() },
+                            onViewLine = { lineCode: String, routeId: String ->
+                                scope.launch {
+                                    try {
+                                        val lineStations = ApiClient.from(transportType).getStationsByLine(lineCode)
+
+                                        if (lineStations.isNotEmpty()) {
+                                            navController.navigate(
+                                                Screen.SearchLine.viewLine(typeArg, lineCode)
+                                            )
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(R.string.routes_line_details_not_available, routeId),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.routes_line_details_not_available, routeId),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }
                         )
                     }
                 }

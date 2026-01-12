@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.bcntransit.app.model.FavoriteDto
 import com.bcntransit.app.screens.map.getDrawableIdByName
 import com.bcntransit.app.R
+import com.bcntransit.app.data.enums.TransportType
 
 @Composable
 fun FavoriteItem(
@@ -96,9 +97,8 @@ fun FavoriteItem(
                         .takeIf { it != 0 } ?: getDrawableIdByName(context, fav.TYPE)
                 }
 
-                // Icono
                 Icon(
-                    painter = painterResource(drawableId),
+                    painter = painterResource(if(fav.TYPE == TransportType.BUS.type) R.drawable.bus else drawableId),
                     contentDescription = null,
                     tint = Color.Unspecified,
                     modifier = Modifier.size(42.dp)
@@ -106,7 +106,6 @@ fun FavoriteItem(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Contenido
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {

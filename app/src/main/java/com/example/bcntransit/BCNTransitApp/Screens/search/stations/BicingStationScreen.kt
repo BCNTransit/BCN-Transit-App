@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,7 +34,7 @@ import com.bcntransit.app.api.BicingApiService
 import com.bcntransit.app.data.enums.TransportType
 import com.bcntransit.app.model.FavoriteDto
 import com.bcntransit.app.screens.search.bicing.BicingStationViewModel
-import com.bcntransit.app.util.getAndroidId
+import com.bcntransit.app.ui.theme.AppThemeMode
 import com.example.bcntransit.BCNTransitApp.components.CustomFloatingActionButton
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 import kotlinx.coroutines.launch
@@ -44,6 +43,7 @@ import kotlinx.coroutines.launch
 fun BicingStationScreen(
     stationId: String,
     bicingApiService: BicingApiService,
+    appThemeMode: AppThemeMode,
     onBackClick: () -> Unit
 ) {
     val viewModel: BicingStationViewModel = viewModel(
@@ -94,6 +94,7 @@ fun BicingStationScreen(
                 latitude = selectedStation.latitude,
                 longitude = selectedStation.longitude,
                 accesses = emptyList(),
+                appThemeMode = appThemeMode,
                 onDismiss = { showFullMap = false }
             )
         } else {
@@ -282,6 +283,7 @@ fun BicingStationScreen(
                                     latitude = selectedStation.latitude,
                                     longitude = selectedStation.longitude,
                                     accesses = emptyList(),
+                                    appThemeMode = appThemeMode,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(200.dp)

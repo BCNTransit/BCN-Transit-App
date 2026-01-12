@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Elevator
 import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.Stairs
@@ -24,6 +24,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -32,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.bcntransit.app.BCNTransitApp.Screens.map.FullScreenMap
 import com.bcntransit.app.BCNTransitApp.Screens.search.routes.RouteCard
+import com.bcntransit.app.BCNTransitApp.components.ArrivalCountdown
 import com.bcntransit.app.BCNTransitApp.components.InlineErrorBanner
 import com.bcntransit.app.BCNTransitApp.components.MiniMap
 import com.bcntransit.app.R
@@ -39,23 +41,24 @@ import com.bcntransit.app.api.ApiClient
 import com.bcntransit.app.api.ApiService
 import com.bcntransit.app.data.enums.TransportType
 import com.bcntransit.app.model.FavoriteDto
-import com.bcntransit.app.model.transport.RouteDto
 import com.bcntransit.app.screens.map.getDrawableIdByName
 import com.bcntransit.app.util.LanguageManager
-import com.bcntransit.app.util.getAndroidId
-import com.example.bcntransit.BCNTransitApp.Screens.search.routes.CompactRouteCard
 import com.example.bcntransit.BCNTransitApp.components.CustomFloatingActionButton
 import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 import kotlinx.coroutines.launch
 import kotlin.Unit
+import androidx.core.graphics.toColorInt
+import com.bcntransit.app.ui.theme.AppThemeMode
 
 @Composable
 fun RoutesScreen(
     lineCode: String,
     stationCode: String,
     apiService: ApiService,
+    appThemeMode: AppThemeMode,
     onConnectionClick: (String, String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onViewLine: (String, String) -> Unit
 ) {
     val viewModel: RoutesViewModel = viewModel(
         key = "$lineCode-$stationCode-${apiService.hashCode()}",
@@ -82,8 +85,6 @@ fun RoutesScreen(
     var isLoadingFavorite by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val currentLangCode = remember { LanguageManager.getSavedLanguage(context) }
-
-    var selectedRoute by remember { mutableStateOf<RouteDto?>(null) }
 
     if (selectedStation == null) {
         Box(
@@ -117,6 +118,7 @@ fun RoutesScreen(
                 latitude = selectedStation!!.latitude,
                 longitude = selectedStation!!.longitude,
                 accesses = accessesState.accesses,
+                appThemeMode = appThemeMode,
                 onDismiss = { showFullMap = false }
             )
         }
@@ -283,22 +285,9 @@ fun RoutesScreen(
                             }
                         }
 
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
 
                         // RUTAS
-                        item {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (selectedRoute == null) {
-                                    Text(
-                                        stringResource(R.string.routes_arrivals),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        modifier = Modifier.padding(top = 16.dp)
-                                    )
-                                } else {
-                                    Spacer(Modifier.padding(top = 16.dp))
-                                }
-                            }
-                        }
-
                         if (routesState.loading && routesState.routes.isEmpty()) {
                             item { CircularProgressIndicator(modifier = Modifier.padding(16.dp), color = colorResource(R.color.medium_red)) }
                         } else if (routesState.error != null) {
@@ -306,70 +295,128 @@ fun RoutesScreen(
                         } else if (routesState.routes.isEmpty()){
                             item { Text(stringResource(R.string.routes_not_available)) }
                         } else {
-                            // CASO 1: Es BUS y tenemos una ruta seleccionada -> MOSTRAMOS SOLO ESA (Grande)
-                            if (selectedStation!!.transport_type == TransportType.BUS.type && selectedRoute != null) {
+                             if (selectedStation!!.transport_type == TransportType.BUS.type && routesState.routes.isNotEmpty()) {
+                                val groupedRoutes = routesState.routes.groupBy { it.line_code }
+
                                 item {
-                                    Column {
-                                        // Botón "Atrás" para volver a la lista (UX importante)
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Línea",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.weight(0.2f), // 20% del ancho
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Text(
+                                            text = "Próximo",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.weight(0.4f), // 40% del ancho
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Text(
+                                            text = "Siguiente",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.weight(0.4f), // 40% del ancho
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                    HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+                                }
+
+                                items(groupedRoutes.entries.toList()) { (lineCode, routes) ->
+                                    val firstRoute = routes.getOrNull(0)
+
+                                    if (firstRoute != null) {
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(bottom = 8.dp)
-                                                .clickable { selectedRoute = null },
-                                            verticalAlignment = Alignment.CenterVertically
+                                                .padding(vertical = 8.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                                contentDescription = stringResource(R.string.back),
-                                                modifier = Modifier.size(16.dp),
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(
-                                                text = stringResource(R.string.route_back_to_list),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
 
-                                        RouteCard(selectedRoute!!, routesState.loading)
-                                    }
-                                }
-                            }
-                            // CASO 2: Es BUS y NO hay selección -> MOSTRAMOS GRID (Compactas)
-                            else if (selectedStation!!.transport_type == TransportType.BUS.type && routesState.routes.size > 1) {
-                                val chunks = routesState.routes.chunked(2)
-                                items(chunks) { rowRoutes ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                    ) {
-                                        // Columna 1
-                                        Box(modifier = Modifier.weight(1f)) {
-                                            CompactRouteCard(
-                                                route = rowRoutes[0],
-                                                isLoading = routesState.loading,
-                                                onClick = { selectedRoute = rowRoutes[0] }
-                                            )
-                                        }
+                                            Box(
+                                                modifier = Modifier.weight(0.2f),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Surface(
+                                                    shape = RoundedCornerShape(4.dp),
+                                                    color = Color(firstRoute.color.toColorInt()),
+                                                    contentColor = Color.White,
+                                                    modifier = Modifier.clickable {
+                                                        onViewLine(firstRoute.line_id, firstRoute.route_id)
+                                                    }
+                                                ) {
+                                                    Text(
+                                                        text = firstRoute.line_name,
+                                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                        style = MaterialTheme.typography.labelLarge,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
 
-                                        // Columna 2
-                                        Box(modifier = Modifier.weight(1f)) {
-                                            if (rowRoutes.size > 1) {
-                                                CompactRouteCard(
-                                                    route = rowRoutes[1],
-                                                    isLoading = routesState.loading,
-                                                    onClick = { selectedRoute = rowRoutes[1] }
-                                                )
-                                            } else {
-                                                Spacer(modifier = Modifier.fillMaxWidth())
+                                            Box(
+                                                modifier = Modifier.weight(0.4f),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                if (firstRoute.next_trips.isNotEmpty()) {
+                                                    val nowSeconds = System.currentTimeMillis() / 1000
+                                                    val diffSeconds = firstRoute.next_trips[0].arrival_time - nowSeconds
+                                                    ArrivalCountdown(
+                                                        arrivalEpochSeconds = firstRoute.next_trips[0].arrival_time,
+                                                        style = MaterialTheme.typography.titleLarge,
+                                                        showSeconds = diffSeconds < 180,
+                                                        isBold = true,
+                                                        isWarning = true
+                                                    )
+                                                }
+                                            }
+
+                                            // --- COLUMNA 3: SIGUIENTE (Route 1) ---
+                                            Box(
+                                                modifier = Modifier.weight(0.4f),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                firstRoute.next_trips.size.let {
+                                                    if (it > 1) {
+                                                        ArrivalCountdown(
+                                                            arrivalEpochSeconds = firstRoute.next_trips[1].arrival_time,
+                                                            style = MaterialTheme.typography.titleLarge,
+                                                            showSeconds = false,
+                                                            isBold = false,
+                                                            isWarning = false
+                                                        )
+                                                    } else {
+                                                        Text(
+                                                            text = "--",
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            color = MaterialTheme.colorScheme.outline
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // Separador sutil entre filas
+                                    HorizontalDivider(
+                                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                                        thickness = 0.5.dp
+                                    )
                                 }
                             }
-                            // CASO 3: NO es BUS (Metro, Tram, etc.) -> Lista normal siempre
+
                             else {
                                 items(routesState.routes) { route ->
                                     RouteCard(route, routesState.loading)
@@ -438,6 +485,7 @@ fun RoutesScreen(
                                     latitude = station.latitude,
                                     longitude = station.longitude,
                                     accesses = accessesState.accesses,
+                                    appThemeMode = appThemeMode,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(200.dp)

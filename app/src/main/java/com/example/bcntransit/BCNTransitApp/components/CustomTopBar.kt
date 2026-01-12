@@ -67,7 +67,6 @@ fun CustomTopBar(
                 }
             }
         },
-        // 2. PASAMOS LAS ACCIONES AL COMPONENTE NATIVO
         actions = actions,
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     )

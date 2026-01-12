@@ -48,7 +48,6 @@ import com.example.bcntransit.BCNTransitApp.components.CustomTopBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -87,29 +86,26 @@ fun SettingsScreen(
         else -> "Español"
     }
 
-    // Texto para mostrar la selección actual
     val currentThemeName = when (state.themeMode) {
         AppThemeMode.LIGHT -> stringResource(R.string.theme_light)
         AppThemeMode.DARK -> stringResource(R.string.theme_dark)
+        AppThemeMode.SYSTEM -> stringResource(R.string.theme_system)
         else -> stringResource(R.string.theme_light)
     }
 
-    if (isRestarting) {
-        RestartLoadingDialog()
-    }
+    if (isRestarting) RestartLoadingDialog()
 
-    // Diálogo de Idioma
     if (showLanguageDialog) {
         LanguageSelectionDialog(
             currentLanguageCode = currentLangCode,
             onDismiss = { showLanguageDialog = false },
-            onLanguageSelected = { code ->
+            onLanguageSelected = { newCode ->
                 showLanguageDialog = false
-                scope.launch {
+                if (newCode != currentLangCode) {
                     isRestarting = true
-                    delay(500)
-                    LanguageManager.setLocale(context, code)
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    scope.launch {
+                        LanguageManager.setLocale(context, newCode)
+                        delay(1000)
                         (context as? Activity)?.recreate()
                     }
                 }
@@ -117,14 +113,13 @@ fun SettingsScreen(
         )
     }
 
-    // Nuevo Diálogo de Tema
     if (showThemeDialog) {
         ThemeSelectionDialog(
             currentTheme = state.themeMode,
             onDismiss = { showThemeDialog = false },
-            onThemeSelected = { newTheme ->
+            onThemeSelected = { newMode ->
+                viewModel.setThemeMode(newMode)
                 showThemeDialog = false
-                viewModel.setThemeMode(newTheme)
             }
         )
     }
@@ -141,67 +136,80 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                SettingsSectionHeader(title = stringResource(R.string.settings_notifications))
 
-            SettingsSectionHeader(title = stringResource(R.string.settings_notifications))
+                SettingsSwitchItem(
+                    icon = Icons.Outlined.Notifications,
+                    title = stringResource(R.string.settings_receive_alerts),
+                    subtitle = stringResource(R.string.settings_push_notifications),
+                    checked = state.receiveAlerts,
+                    onCheckedChange = { viewModel.toggleReceiveAlerts(it) }
+                )
 
-            SettingsSwitchItem(
-                icon = Icons.Outlined.Notifications,
-                title = stringResource(R.string.settings_receive_alerts),
-                subtitle = stringResource(R.string.settings_push_notifications),
-                checked = state.receiveAlerts,
-                onCheckedChange = { viewModel.toggleReceiveAlerts(it) }
-            )
+                HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                SettingsSectionHeader(title = stringResource(R.string.settings_preferences))
 
-            SettingsSectionHeader(title = stringResource(R.string.settings_preferences))
+                SettingsNavigationItem(
+                    icon = Icons.Outlined.Language,
+                    title = stringResource(R.string.settings_language),
+                    subtitle = currentLanguageName,
+                    onClick = { showLanguageDialog = true }
+                )
 
-            SettingsNavigationItem(
-                icon = Icons.Outlined.Language,
-                title = stringResource(R.string.settings_language),
-                subtitle = currentLanguageName,
-                onClick = { showLanguageDialog = true }
-            )
+                HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                SettingsNavigationItem(
+                    icon = Icons.Outlined.Palette,
+                    title = stringResource(R.string.settings_theme),
+                    subtitle = currentThemeName,
+                    onClick = { showThemeDialog = true }
+                )
 
-            SettingsNavigationItem(
-                icon = Icons.Outlined.Palette,
-                title = stringResource(R.string.settings_theme),
-                subtitle = currentThemeName,
-                onClick = { showThemeDialog = true }
-            )
+                HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                SettingsSectionHeader(title = stringResource(R.string.settings_information))
 
-            SettingsSectionHeader(title = stringResource(R.string.settings_information))
+                SettingsNavigationItem(
+                    icon = Icons.Outlined.Info,
+                    title = stringResource(R.string.settings_about),
+                    onClick = onNavigateToAbout
+                )
 
-            SettingsNavigationItem(
-                icon = Icons.Outlined.Info,
-                title = stringResource(R.string.settings_about),
-                onClick = onNavigateToAbout
-            )
+                SettingsNavigationItem(
+                    icon = Icons.Outlined.Security,
+                    title = stringResource(R.string.settings_privacy),
+                    onClick = onNavigateToPrivacy
+                )
 
-            SettingsNavigationItem(
-                icon = Icons.Outlined.Security,
-                title = stringResource(R.string.settings_privacy),
-                onClick = onNavigateToPrivacy
-            )
+                SettingsNavigationItem(
+                    icon = Icons.Outlined.Description,
+                    title = stringResource(R.string.settings_terms_and_conditions),
+                    onClick = onNavigateToTermsAndConditions
+                )
 
-            SettingsNavigationItem(
-                icon = Icons.Outlined.Description,
-                title = stringResource(R.string.settings_terms_and_conditions),
-                onClick = onNavigateToTermsAndConditions
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp), // Un poco de margen vertical
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .padding(horizontal = 24.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+
                 Surface(
                     onClick = { copyIdToClipboard() },
                     shape = RoundedCornerShape(8.dp),
@@ -219,7 +227,7 @@ fun SettingsScreen(
                         )
                         Text(
                             text = userId,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace
                         )

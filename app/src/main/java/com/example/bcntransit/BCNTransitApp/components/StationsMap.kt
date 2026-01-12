@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -17,8 +18,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.bcntransit.app.model.transport.StationDto
-import com.bcntransit.app.screens.map.configureMapStyle
 import com.bcntransit.app.screens.map.rememberMapViewWithLifecycle
+import com.bcntransit.app.ui.theme.AppThemeMode
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
@@ -42,15 +43,28 @@ private const val BORDER_WIDTH = 3f
 fun StationsMap(
     stations: List<StationDto>,
     lineColor: Color,
+    appThemeMode: AppThemeMode,
     modifier: Modifier = Modifier,
     onStationClick: (StationDto) -> Unit
 ) {
     val context = LocalContext.current
+
     val mapView = rememberMapViewWithLifecycle(context)
     var currentSymbolManager by remember { mutableStateOf<SymbolManager?>(null) }
+    val isDarkTheme = !(appThemeMode == AppThemeMode.LIGHT || (appThemeMode == AppThemeMode.SYSTEM && !isSystemInDarkTheme()))
 
-    val stationsKey = remember(stations) {
-        stations.joinToString(",") { "${it.code}-${it.has_alerts}" }
+    val mapStyleUrl = if (isDarkTheme) {
+        "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+    } else {
+        "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+    }
+
+    val labelTextColor = if (isDarkTheme) "#FFFFFF" else "#000000"
+    val labelHaloColor = if (isDarkTheme) "#000000" else "#FFFFFF"
+
+    val mapConfigKey = remember(stations, lineColor, isDarkTheme) {
+        val stationsHash = stations.joinToString(",") { "${it.code}-${it.has_alerts}" }
+        "$stationsHash-${lineColor.toArgb()}-$isDarkTheme"
     }
 
     DisposableEffect(Unit) {
@@ -60,16 +74,15 @@ fun StationsMap(
         }
     }
 
-    LaunchedEffect(stationsKey, lineColor) {
+    LaunchedEffect(mapConfigKey) {
         mapView.getMapAsync { map ->
-            map.getStyle { style ->
-                // 1. Limpieza
-                currentSymbolManager?.deleteAll()
-                currentSymbolManager = null
-                style.getLayer("route-layer")?.let { style.removeLayer(it) }
-                style.getSource("route-source")?.let { style.removeSource(it) }
 
-                // 2. Línea (Fondo)
+            map.setStyle(mapStyleUrl) { style ->
+
+                currentSymbolManager?.deleteAll()
+                style.removeLayer("route-layer")
+                style.removeSource("route-source")
+
                 if (stations.size > 1) {
                     val points = stations.map { Point.fromLngLat(it.longitude, it.latitude) }
                     val lineSource = GeoJsonSource(
@@ -78,7 +91,6 @@ fun StationsMap(
                     )
                     style.addSource(lineSource)
 
-
                     val lineLayer = LineLayer("route-layer", "route-source").withProperties(
                         lineColor(lineColor.toArgb()),
                         lineWidth(3f)
@@ -86,7 +98,51 @@ fun StationsMap(
                     style.addLayer(lineLayer)
                 }
 
-                // 3. Symbol Manager
+                val center = ICON_SIZE / 2f
+
+                val iconNormalName = "station-circle-${lineColor.toArgb()}"
+                val bitmapNormal = Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888)
+                val canvasNormal = Canvas(bitmapNormal)
+                val paintNormal = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = lineColor.toArgb()
+                }
+                paintNormal.style = Paint.Style.FILL
+                canvasNormal.drawCircle(center, center, STATION_RADIUS, paintNormal)
+                style.addImage(iconNormalName, bitmapNormal)
+
+                val iconWarningName = "station-warning-${lineColor.toArgb()}"
+                val bitmapWarning = Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888)
+                val canvasWarning = Canvas(bitmapWarning)
+
+                canvasWarning.drawCircle(center, center, STATION_RADIUS, paintNormal)
+
+                val badgeCx = center + (STATION_RADIUS * 0.7f)
+                val badgeCy = center - (STATION_RADIUS * 0.7f)
+
+                val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = android.graphics.Color.WHITE
+                }
+                borderPaint.style = Paint.Style.FILL
+                canvasWarning.drawCircle(badgeCx, badgeCy, ALERT_RADIUS + BORDER_WIDTH, borderPaint)
+
+                val badgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = android.graphics.Color.RED
+                }
+                badgePaint.style = Paint.Style.FILL
+                canvasWarning.drawCircle(badgeCx, badgeCy, ALERT_RADIUS, badgePaint)
+
+                val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = android.graphics.Color.WHITE
+                    textSize = ALERT_RADIUS * 1.5f
+                    typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                    textAlign = Paint.Align.CENTER
+                }
+                val textY = badgeCy - ((textPaint.descent() + textPaint.ascent()) / 2)
+                canvasWarning.drawText("!", badgeCx, textY, textPaint)
+
+                style.addImage(iconWarningName, bitmapWarning)
+
+
                 val symbolManager = SymbolManager(mapView, map, style).apply {
                     iconAllowOverlap = true
                     textAllowOverlap = false
@@ -102,87 +158,29 @@ fun StationsMap(
                     true
                 }
 
-                // --- GENERACIÓN DE ICONOS ---
-                val center = ICON_SIZE / 2f
-
-                // A) Icono Normal
-                val iconNormalName = "station-circle-${lineColor.toArgb()}"
-                if (style.getImage(iconNormalName) == null) {
-                    val bitmap = Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888)
-                    val canvas = Canvas(bitmap)
-                    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-                    paint.color = lineColor.toArgb()
-                    paint.style = Paint.Style.FILL
-
-                    // Dibujamos en el centro absoluto
-                    canvas.drawCircle(center, center, STATION_RADIUS, paint)
-                    style.addImage(iconNormalName, bitmap)
-                }
-
-                // B) Icono Warning (REEMPLAZO)
-                val iconWarningName = "station-warning-${lineColor.toArgb()}"
-                if (style.getImage(iconWarningName) == null) {
-                    val bitmap = Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888)
-                    val canvas = Canvas(bitmap)
-
-                    // 1. Estación Base (IGUAL que el normal: Centro absoluto)
-                    val paintBase = Paint(Paint.ANTI_ALIAS_FLAG)
-                    paintBase.color = lineColor.toArgb()
-                    paintBase.style = Paint.Style.FILL
-                    canvas.drawCircle(center, center, STATION_RADIUS, paintBase)
-
-                    // 2. Badge de Alerta (Superpuesto en la esquina superior derecha)
-                    val badgeCx = center + (STATION_RADIUS * 0.7f)
-                    val badgeCy = center - (STATION_RADIUS * 0.7f)
-
-                    // Borde Blanco
-                    val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-                    borderPaint.color = android.graphics.Color.WHITE
-                    borderPaint.style = Paint.Style.FILL
-                    canvas.drawCircle(badgeCx, badgeCy, ALERT_RADIUS + BORDER_WIDTH, borderPaint)
-
-                    // Círculo Rojo
-                    val badgePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-                    badgePaint.color = android.graphics.Color.RED
-                    badgePaint.style = Paint.Style.FILL
-                    canvas.drawCircle(badgeCx, badgeCy, ALERT_RADIUS, badgePaint)
-
-                    // Signo "!"
-                    val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-                    textPaint.color = android.graphics.Color.WHITE
-                    textPaint.textSize = ALERT_RADIUS * 1.5f
-                    textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                    textPaint.textAlign = Paint.Align.CENTER
-                    val textY = badgeCy - ((textPaint.descent() + textPaint.ascent()) / 2)
-                    canvas.drawText("!", badgeCx, textY, textPaint)
-
-                    style.addImage(iconWarningName, bitmap)
-                }
-
-                stations.forEach { station ->
+                val optionsList = stations.map { station ->
                     val iconToUse = if (station.has_alerts) iconWarningName else iconNormalName
 
-                    symbolManager.create(
-                        SymbolOptions()
-                            .withLatLng(LatLng(station.latitude, station.longitude))
-                            .withIconImage(iconToUse)
-                            .withIconSize(1.0f)
-                            .withTextField(station.name)
-                            .withTextOffset(arrayOf(0f, 1.2f))
-                            .withTextSize(12f)
-                            .withTextColor("#000000")
-                            .withTextHaloColor("#FFFFFF")
-                            .withTextHaloWidth(2f)
-                            .withTextAnchor("top")
-                    )
+                    SymbolOptions()
+                        .withLatLng(LatLng(station.latitude, station.longitude))
+                        .withIconImage(iconToUse)
+                        .withIconSize(1.0f)
+                        .withTextField(station.name)
+                        .withTextOffset(arrayOf(0f, 1.2f))
+                        .withTextSize(12f)
+                        .withTextColor(labelTextColor)
+                        .withTextHaloColor(labelHaloColor)
+                        .withTextHaloWidth(2f)
+                        .withTextAnchor("top")
                 }
 
-                // 5. Cámara
+                symbolManager.create(optionsList)
+
+
                 if (stations.isNotEmpty()) {
                     val boundsBuilder = LatLngBounds.Builder()
                     stations.forEach { s -> boundsBuilder.include(LatLng(s.latitude, s.longitude)) }
-                    val bounds = boundsBuilder.build()
-                    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150))
+                    map.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 150))
                 }
             }
         }
@@ -190,17 +188,6 @@ fun StationsMap(
 
     AndroidView(
         factory = { mapView },
-        modifier = modifier,
-        update = { view ->
-            view.getMapAsync { map ->
-                configureMapStyle(
-                    context = context,
-                    map = map,
-                    enableLocationComponent = false,
-                    scrollEnabled = true,
-                    zoomEnabled = true
-                ) { }
-            }
-        }
+        modifier = modifier
     )
 }
