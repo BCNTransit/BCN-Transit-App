@@ -1,10 +1,13 @@
 package com.bcntransit.app.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.Dp
@@ -19,9 +22,13 @@ fun BottomNavigationBar(
     selectedTab: BottomTab,
     onTabSelected: (BottomTab) -> Unit
 ) {
+    val navBarShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+
     NavigationBar(
-        modifier = modifier,
-        tonalElevation = 8.dp,
+        modifier = modifier
+            .shadow(elevation = 8.dp, shape = navBarShape)
+            .clip(navBarShape),
+        tonalElevation = 0.dp,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
     ) {
         BottomTab.values().forEach { tab ->
@@ -39,14 +46,14 @@ fun BottomNavigationBar(
                     ) {
                         Icon(
                             imageVector = tab.icon,
-                            contentDescription = stringResource( tab.labelResId),
+                            contentDescription = stringResource(tab.labelResId),
                             tint = iconColor
                         )
                     }
                 },
                 label = {
                     Text(
-                        text = stringResource( tab.labelResId),
+                        text = stringResource(tab.labelResId),
                         color = iconColor
                     )
                 },

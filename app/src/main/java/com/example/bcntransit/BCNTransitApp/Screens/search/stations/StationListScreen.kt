@@ -19,6 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bcntransit.app.BCNTransitApp.components.InlineErrorBanner
@@ -70,20 +72,28 @@ fun StationListScreen(
                 CustomTopBar(
                     onBackClick = onBackClick,
                     title = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Icon(
-                                painter = painterResource(drawableId),
-                                contentDescription = null,
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(42.dp)
-                            )
-                            Spacer(Modifier.width(16.dp))
-                            Text(line.description, style = MaterialTheme.typography.titleLarge)
-                        }
+                        ListItem(
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+
+                            leadingContent = {
+                                Icon(
+                                    painter = painterResource(drawableId),
+                                    contentDescription = null,
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(38.dp)
+                                )
+                            },
+
+                            headlineContent = {
+                                Text(
+                                    text = line.description,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        )
                     },
                     actions = {
                         val hasAlerts = line.has_alerts && line.alerts.isNotEmpty()
@@ -96,7 +106,10 @@ fun StationListScreen(
                                             containerColor = colorResource(R.color.medium_red),
                                             contentColor = Color.White
                                         ) {
-                                            Text("${line.alerts.size}")
+                                            Text(
+                                                text = "${line.alerts.size}",
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
                                         }
                                     }
                                 ) {
@@ -110,7 +123,7 @@ fun StationListScreen(
                                 Icon(
                                     imageVector = Icons.Outlined.Info,
                                     contentDescription = "Información del servicio",
-                                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

@@ -61,8 +61,8 @@ fun WidgetConfigurationScreen(
 
     val groupedFavorites = remember(favorites) {
         favorites
-            .filter { it.TYPE.lowercase() != TransportType.BICING.type }
-            .groupBy { it.TYPE.uppercase() }
+            .filter { it.type.lowercase() != TransportType.BICING.type }
+            .groupBy { it.type.uppercase() }
     }
 
     LaunchedEffect(currentUserId) {
@@ -159,8 +159,8 @@ fun FavoriteWidgetRow(
     onClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val type = favorite.TYPE.lowercase()
-    val lineName = favorite.LINE_NAME?.lowercase()?.replace(" ", "_")
+    val type = favorite.type.lowercase()
+    val lineName = favorite.line_name?.lowercase()?.replace(" ", "_")
 
     val drawableName =
         "${type}_${lineName}"
@@ -183,14 +183,14 @@ fun FavoriteWidgetRow(
         },
         headlineContent = {
             Text(
-                text = favorite.STATION_NAME,
+                text = favorite.station_name,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )
         },
         supportingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                favorite.STATION_CODE.ifEmpty { favorite.LINE_NAME }?.let {
+                favorite.station_code.ifEmpty { favorite.line_name }?.let {
                     Text(
                         text = "(" + it + ")",
                         style = MaterialTheme.typography.bodyMedium,

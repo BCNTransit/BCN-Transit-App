@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -49,14 +50,14 @@ fun BusLinesScreen(
     val context = LocalContext.current
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface, // Fondo base
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             CustomTopBar(
                 onBackClick = onBackClick,
                 title = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val drawableId = remember(TransportType.BUS) {
                             context.resources.getIdentifier(
@@ -69,7 +70,6 @@ fun BusLinesScreen(
                             tint = Color.Unspecified,
                             modifier = Modifier.size(38.dp)
                         )
-                        Spacer(Modifier.width(12.dp))
                         Text(
                             stringResource(R.string.bus_lines),
                             style = MaterialTheme.typography.titleLarge

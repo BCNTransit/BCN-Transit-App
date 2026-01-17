@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +48,21 @@ fun SearchTopBar(
 
     val brandColor = MaterialTheme.colorScheme.primary
 
-    // 1. Lógica de Búsqueda
+    val searchBarColors = SearchBarDefaults.colors(
+        containerColor = if (active) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surfaceContainerLowest,
+
+        dividerColor = Color.Transparent,
+
+        inputFieldColors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            cursorColor = MaterialTheme.colorScheme.primary
+        )
+    )
+
     LaunchedEffect(Unit) {
         snapshotFlow { query }
             .debounce(300)
@@ -100,20 +113,10 @@ fun SearchTopBar(
                 }
             },
             enabled = enabled,
+            windowInsets = WindowInsets(0.dp),
             tonalElevation = 0.dp,
             shadowElevation = if (active) 0.dp else 6.dp,
-            colors = SearchBarDefaults.colors(
-                containerColor = if (active) {
-                    MaterialTheme.colorScheme.surfaceContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceContainerHigh
-                },
-                dividerColor = Color.Transparent,
-                inputFieldColors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            ),
+            colors = searchBarColors,
             leadingIcon = {
                 Icon(
                     imageVector = if (query.isEmpty() && active) Icons.Rounded.History else Icons.Rounded.Search,
@@ -125,12 +128,11 @@ fun SearchTopBar(
                 Text(
                     text = stringResource(R.string.map_search_station),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 8.dp)
+                .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 20.dp)
         ) {
             if (isSearching) {
                 Box(

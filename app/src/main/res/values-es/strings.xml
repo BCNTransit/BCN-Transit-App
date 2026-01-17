@@ -1,0 +1,162 @@
+<resources>
+    <string name="app_name">BCN Transit</string>
+    <string name="widget_bcn_transit_description">"         Muestra una de tus estaciones favoritas, incluyendo la línea, dirección y próximos trenes.     "</string>
+    <string name="back">Atrás</string>
+    <string name="metro">El metro de Barcelona abre todos los días a las 5 de la mañana. Las horas de finalización del servicio varían en función del tipo de día.\n\n
+        Laborables (de lunes a jueves): hasta las 24.00 h.\n
+        Viernes y vísperas de festivo: hasta las 2.00 h.\n
+        Sábados: servicio continuo toda la noche.\n
+        Domingos y festivos entre semana: hasta las 24.00 h.
+    </string>
+    <string name="menu_map">Mapa</string>
+    <string name="menu_lines">Líneas</string>
+    <string name="menu_favourites">Favoritos</string>
+    <string name="menu_settings">Configuración</string>
+    <string name="map_loading_stations">Cargando estaciones cercanas...</string>
+    <string name="map_search_station">Buscar estación...</string>
+    <string name="settings_notifications">NOTIFICACIONES</string>
+    <string name="settings_receive_alerts">Recibir alertas</string>
+    <string name="settings_push_notifications">Notificaciones push sobre el estado del transporte</string>
+    <string name="settings_preferences">PREFERENCIAS</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_information">INFORMACIÓN</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_privacy">Política de privacidad</string>
+    <string name="settings_terms_and_conditions">Términos y condiciones</string>
+    <string name="settings_id">Identificador</string>
+    <string name="version">Versión 1.0.0</string>
+
+    <string name="about_title">Acerca de</string>
+    <string name="about_description">BCNTransit es tu compañero de viaje en Barcelona. Consulta tiempos en tiempo real, recibe alertas de servicio y localiza tus estaciones favoritas de Metro, Bus, Rodalies FGC y Bicing.</string>
+    <string name="about_contact_support">Contactar soporte</string>
+    <string name="about_visit_website">Visitar sitio web</string>
+    <string name="about_rate_app">Valorar aplicación</string>
+    <string name="about_developed_by">Diseñado y desarrollado por</string>
+
+    <string name="terms_title">Términos y Condiciones</string>
+    <string name="terms_header">Condiciones de uso</string>
+    <string name="terms_intro">Al descargar o utilizar la aplicación, estos términos se aplicarán automáticamente. Asegúrate de leerlos cuidadosamente antes de usar la aplicación.</string>
+
+    <string name="terms_section1_title">1. Precisión de los datos</string>
+    <string name="terms_section1_text">BCNTransit actúa como un intermediario que muestra información pública proporcionada por las operadoras de transporte (TMB, AMB, FGC). No garantizamos la exactitud, integridad o puntualidad de los horarios mostrados, ya que pueden verse afectados por incidencias externas.</string>
+
+    <string name="terms_section2_title">2. Uso prohibido</string>
+    <string name="terms_section2_text">Está prohibido intentar extraer el código fuente de la aplicación, traducir la app a otros idiomas con fines comerciales o intentar realizar ingeniería inversa. Tampoco se permite el uso de la API de la app de forma abusiva.</string>
+
+    <string name="terms_section3_title">3. Propiedad Intelectual</string>
+    <string name="terms_section3_text">La aplicación, el diseño y el código fuente son propiedad intelectual de BCNTransit. Los datos de transporte son propiedad de sus respectivos proveedores públicos.</string>
+
+    <string name="terms_section4_title">4. Limitación de responsabilidad</string>
+    <string name="terms_section4_text">El desarrollador no se hace responsable de las pérdidas directas o indirectas (como llegar tarde al trabajo o perder un enlace) derivadas de confiar en la información proporcionada por la aplicación.</string>
+    <string name="lines_and_stations">Ver líneas y estaciones de %1$s</string>
+    <string name="lines_and_stops">Ver líneas y paradas de %1$s</string>
+    <string name="lines_select_transport_type">Selecciona el tipo de transporte para explorar sus líneas y estaciones disponibles.</string>
+    <string name="lines_transport_types">Tipos de transporte disponibles</string>
+    <string name="lines_available">Líneas disponibles</string>
+    <string name="bus_lines">Líneas de Bus</string>
+    <string name="incidents">Incidencias</string>
+    <string name="normal_service">Servicio normal</string>
+    <string name="see_details">Ver detalles</string>
+    <string name="availability">Disponibilidad</string>
+    <string name="delete_favorite">Eliminar favorito</string>
+    <string name="delete_favorite_body">¿Seguro que deseas eliminar este favorito?</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="favorites">Favoritos</string>
+    <string name="favorites_description">Aquí encontrarás tus estaciones y líneas favoritas para acceder rápidamente a sus horarios y rutas</string>
+    <string name="favorite_deleted">Favorito eliminado</string>
+    <string name="bicing_station_info">Plazas: %1$d\nB. Eléctricas: %2$d\nB. Mecánicas: %3$d</string>
+    <string name="connection_error">Error de conexión</string>
+    <string name="delete_favorite_error">Error eliminando favorito</string>
+    <string name="map_extra_filters">Filtros extra</string>
+    <string name="apply">Aplicar</string>
+    <string name="bicing_filter_1">Solo paradas con plazas libres</string>
+    <string name="bicing_filter_2">Solo paradas con bicis disponibles</string>
+    <string name="any_type">Cualquier tipo</string>
+    <string name="bicing_electrical_type">Con bicis eléctricas</string>
+    <string name="bicing_mechanical_type">Con bicis mecánicas</string>
+    <string name="results">Resultados</string>
+    <string name="max_distance">Distancia máxima desde ubicación actual:</string>
+    <string name="bicing_bikes">Bicis</string>
+    <string name="bicing_slots">Plazas</string>
+    <string name="bicing_electrical">Eléctricas</string>
+    <string name="bicing_mechanical">Mecánicas</string>
+    <string name="bicing_bike_detail">Detalle de bicis</string>
+    <string name="lines">Lineas</string>
+    <string name="connections">Conexiones</string>
+    <string name="incident">Incidencia</string>
+    <string name="alert">Alerta</string>
+    <string name="alert_affects">Afecta a:</string>
+    <string name="alert_start_date">Inicio: %1$s</string>
+    <string name="date">Fecha</string>
+    <string name="alert_without_cause">Incidencia sin descripción detallada.</string>
+    <string name="alert_service_status">Estado del servicio:</string>
+    <string name="alerts_no_incidents">No hay incidencias reportadas.</string>
+    <string name="bicing_available_types">Tipos de Bici Disponibles</string>
+    <string name="location">Ubicación</string>
+    <string name="bicing_in_service">En servicio</string>
+    <string name="bicing_out_of_service">Fuera de servicio</string>
+    <string name="stops">Paradas</string>
+    <string name="list">Lista</string>
+    <string name="routes_arrivals">Llegadas</string>
+    <string name="routes_connections">Enlaces</string>
+    <string name="routes_not_available">No hay rutas disponibles.</string>
+    <string name="routes_direction">Dirección</string>
+    <string name="last_update">Última actualización: Enero 2026</string>
+    <string name="privacy_intro">BCNTransit respeta tu privacidad y se compromete a proteger tus datos personales. Esta política describe qué información recopilamos, cómo la usamos y qué derechos tienes.</string>
+    <string name="privacy_section1_title">1. Información que recopilamos</string>
+    <string name="privacy_section1_body">
+    • Identificador del dispositivo (Android ID), usado de forma anónima para mejorar la estabilidad.\n
+    • Preferencias de configuración (tema oscuro, notificaciones).\n
+    • Datos agregados de uso (frecuencia, errores).\n\n
+    BCNTransit no recopila datos sensibles, ubicaciones en tiempo real ni información de contacto.
+    </string>
+    <string name="privacy_section2_title">2. Uso de la información</string>
+    <string name="privacy_section2_body">
+    Los datos se utilizan exclusivamente para:\n
+    • Mostrar información del transporte en tiempo real.\n
+    • Enviar notificaciones de incidencias.\n
+    • Mejorar el rendimiento de la app.
+    </string>
+    <string name="privacy_section3_title">3. Compartición de datos</string>
+    <string name="privacy_section3_body">BCNTransit no comparte ni vende información personal a terceros. Algunos datos técnicos pueden ser procesados por servicios como Firebase Cloud Messaging para notificaciones, bajo sus propias políticas.</string>
+
+    <string name="privacy_section4_title">4. Seguridad</string>
+    <string name="privacy_section4_body">Implementamos medidas técnicas y organizativas para proteger tus datos frente a accesos no autorizados, pérdida o alteración.</string>
+
+    <string name="privacy_section5_title">5. Tus derechos</string>
+    <string name="privacy_section5_body">Puedes solicitar la eliminación de tus datos locales desinstalando la aplicación. BCNTransit no almacena datos identificables en servidores externos.</string>
+
+    <string name="privacy_section6_title">6. Cambios en esta política</string>
+    <string name="privacy_section6_body">Esta política puede actualizarse. Te notificaremos cambios importantes mediante la app o el sitio web oficial.</string>
+    <string name="location_permission_required">Permiso de ubicación requerido</string>
+    <string name="location_permission_explanation">Para mostrarte las paradas cercanas y tu posición en el mapa, necesitamos acceso a tu ubicación.</string>
+    <string name="open_settings">Abrir Configuración</string>
+    <string name="settings_theme">Tema de la aplicación</string>
+    <string name="settings_theme_select">Seleccionar tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Sistema</string>
+    <string name="id_copied">ID copiado al portapapeles</string>
+    <string name="settings_updating_language">Actualizando idioma...</string>
+    <string name="route_arriving">Llegando</string>
+    <string name="route_back_to_list">Volver a la lista</string>
+    <string name="show_more">Ver más</string>
+    <string name="show_less">Ver menos</string>
+    <string name="favorites_empty_title">Aún no tienes favoritos</string>
+    <string name="favorites_empty_body">Busca tus líneas o paradas frecuentes y pulsa la estrella para guardarlas aquí.</string>
+    <string name="routes_line_details_not_available">Detalles no disponibles para la línea: %1$s</string>
+    <string name="onboarding_title_1">Todo BCN Unificado</string>
+    <string name="onboarding_desc_1">Consulta Metro, TMB, AMB, Rodalies, FGC y Tram en una sola app.</string>
+
+    <string name="onboarding_title_2">Tiempo Real y Mapas</string>
+    <string name="onboarding_desc_2">Mapas vectoriales rápidos con tiempos de llegada precisos para que no esperes.</string>
+
+    <string name="onboarding_title_3">Bicing y Accesibilidad</string>
+    <string name="onboarding_desc_3">Consulta disponibilidad de bicicletas y el estado de los ascensores en las estaciones.</string>
+
+    <string name="onboarding_title_4">Encuentra lo cercano</string>
+    <string name="onboarding_desc_4">Activa tu ubicación para detectar automáticamente las paradas a tu alrededor.</string>
+    <string name="map_no_nearby_stations">No se han encontrado estaciones cercanas</string>
+    <string name="map_search_area">Buscar en esta zona</string>
+</resources>

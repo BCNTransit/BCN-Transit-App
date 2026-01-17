@@ -1,12 +1,12 @@
 package com.bcntransit.app.model
 
 data class FavoriteDto(
-    val TYPE: String,
-    val STATION_CODE: String,
-    val STATION_NAME: String,
-    val STATION_GROUP_CODE: String?,
-    val LINE_NAME: String?,
-    val LINE_NAME_WITH_EMOJI: String?,
-    val LINE_CODE: String,
+    val type: String,
+    val station_code: String,
+    val station_name: String,
+    val station_group_code: String?,
+    val line_name: String?,
+    val line_name_with_emoji: String?,
+    val line_code: String,
     val coordinates: List<Double>
 )

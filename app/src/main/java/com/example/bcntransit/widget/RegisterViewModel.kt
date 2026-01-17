@@ -1,14 +1,33 @@
 package com.bcntransit.app.widget
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.bcntransit.app.api.ApiClient
+import com.bcntransit.app.data.UserPreferences
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val context = getApplication<Application>()
+    private val userPrefs = UserPreferences.getInstance(context)
+    val isOnboardingCompleted = userPrefs.isOnboardingCompleted
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            null
+        )
+
+    fun completeOnboarding() {
+        viewModelScope.launch {
+            userPrefs.completeOnboarding()
+        }
+    }
     fun registerUser() {
         viewModelScope.launch {
             try {

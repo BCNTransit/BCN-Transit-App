@@ -4,11 +4,17 @@
     import android.os.Build
     import android.widget.Toast
     import androidx.annotation.RequiresApi
+    import androidx.compose.foundation.layout.Box
+    import androidx.compose.foundation.layout.WindowInsets
+    import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.padding
+    import androidx.compose.material3.MaterialTheme
     import androidx.compose.material3.Scaffold
+    import androidx.compose.material3.Surface
     import androidx.compose.runtime.*
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.platform.LocalContext
+    import androidx.compose.ui.unit.dp
     import com.bcntransit.app.api.ApiClient
     import com.bcntransit.app.data.enums.BottomTab
     import com.bcntransit.app.model.transport.LineDto
@@ -71,12 +77,8 @@
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
 
-
-        LaunchedEffect(Unit) {
-            registerViewModel.registerUser()
-        }
-
         Scaffold(
+            contentWindowInsets = WindowInsets(0.dp),
             bottomBar = {
                 if (showBottomBar) {
                     BottomNavigationBar(
@@ -134,7 +136,7 @@
             NavHost(
                 navController = navController,
                 startDestination = Screen.Map.route,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier
             ) {
                 composable(Screen.Map.route) {
                     MapScreen(
@@ -153,13 +155,20 @@
                 }
 
                 composable(Screen.Search.route) {
-                    SearchScreen(
-                        onTypeSelected = { type ->
-                            navController.navigate(
-                                Screen.SearchType.viewType(type)
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.surfaceContainer
+                    ) {
+                        Box(modifier = Modifier.padding(bottom = padding.calculateBottomPadding())) {
+                            SearchScreen(
+                                onTypeSelected = { type ->
+                                    navController.navigate(
+                                        Screen.SearchType.viewType(type)
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
                 }
                 /** LISTA DE LÍNEAS */
                 composable(
@@ -281,17 +290,24 @@
                 }
 
                 composable(Screen.Favorites.route) {
-                    FavoritesScreen(
-                        onFavoriteSelected = { fav ->
-                            navController.navigate(
-                                Screen.SearchStation.viewRoutes(
-                                    type = fav.TYPE,
-                                    lineCode = fav.LINE_CODE,
-                                    stationCode = fav.STATION_CODE
-                                )
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.surfaceContainer
+                    ) {
+                        Box(modifier = Modifier.padding(bottom = padding.calculateBottomPadding())) {
+                            FavoritesScreen(
+                                onFavoriteSelected = { fav ->
+                                    navController.navigate(
+                                        Screen.SearchStation.viewRoutes(
+                                            type = fav.type,
+                                            lineCode = fav.line_code,
+                                            stationCode = fav.station_code
+                                        )
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
                 }
                 composable(Screen.Settings.route) {
                     SettingsScreen(

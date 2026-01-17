@@ -82,7 +82,7 @@ fun LineItem(line: LineDto, onClick: () -> Unit) {
                         Text(
                             text = alertText,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = alertColor
                         )
                     }
                 }

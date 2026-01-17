@@ -1,5 +1,6 @@
 package com.example.bcntransit.api
 
+import android.util.Log
 import com.bcntransit.app.BuildConfig
 import com.example.bcntransit.app.AuthManager
 import okhttp3.Interceptor
@@ -17,6 +18,7 @@ class AuthInterceptor(private val authManager: AuthManager) : Interceptor {
 
         if (firebaseToken != null) {
             requestBuilder.header("Authorization", "Bearer $firebaseToken")
+            Log.d("BEARER", firebaseToken)
         }
 
         return chain.proceed(requestBuilder.build())

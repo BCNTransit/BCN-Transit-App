@@ -91,14 +91,14 @@ fun FavoriteItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val context = LocalContext.current
-                val drawableName = "${fav.TYPE}_${fav.LINE_NAME?.lowercase()?.replace(" ", "_")}"
-                val drawableId = remember(fav.LINE_NAME) {
+                val drawableName = "${fav.type}_${fav.line_name?.lowercase()?.replace(" ", "_")}"
+                val drawableId = remember(fav.line_name) {
                     context.resources.getIdentifier(drawableName, "drawable", context.packageName)
-                        .takeIf { it != 0 } ?: getDrawableIdByName(context, fav.TYPE)
+                        .takeIf { it != 0 } ?: getDrawableIdByName(context, fav.type)
                 }
 
                 Icon(
-                    painter = painterResource(if(fav.TYPE == TransportType.BUS.type) R.drawable.bus else drawableId),
+                    painter = painterResource(if(fav.type == TransportType.BUS.type) R.drawable.bus else drawableId),
                     contentDescription = null,
                     tint = Color.Unspecified,
                     modifier = Modifier.size(42.dp)
@@ -110,7 +110,7 @@ fun FavoriteItem(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = fav.STATION_NAME,
+                        text = fav.station_name,
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
@@ -120,7 +120,7 @@ fun FavoriteItem(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "(${fav.STATION_CODE})",
+                        text = "(${fav.station_code})",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,

@@ -3,6 +3,7 @@ package com.bcntransit.app.screens.map
 import SearchTopBar
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -68,6 +69,11 @@ import com.example.bcntransit.BCNTransitApp.components.CustomFloatingActionButto
 import com.example.bcntransit.BCNTransitApp.components.CustomSwitch
 
 import android.provider.Settings
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -76,7 +82,11 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.zIndex
 import com.bcntransit.app.ui.theme.AppThemeMode
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.style.expressions.Expression
+import org.maplibre.android.style.layers.PropertyFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -210,8 +220,9 @@ fun MapContent(
         key = mapKey,
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val application = context.applicationContext as Application
                 @Suppress("UNCHECKED_CAST")
-                return MapViewModel(context) as T
+                return MapViewModel(application) as T
             }
         }
     )
@@ -244,8 +255,25 @@ fun MapContent(
     var isSearchActive by remember { mutableStateOf(false) }
 
     var initialUserZoomDone by remember { mutableStateOf(false) }
-
     val bicingTemplate = stringResource(R.string.bicing_station_info)
+    val noNearbyStations = stringResource(R.string.map_no_nearby_stations)
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var currentCameraTarget by remember { mutableStateOf<LatLng?>(null) }
+    var lastSearchLocation by remember { mutableStateOf<LatLng?>(null) }
+    var showSearchAreaButton by remember { mutableStateOf(false) }
+
+    LaunchedEffect(nearbyStations) {
+        if (nearbyStations.isEmpty() && !isSearchActive && drawerState.isClosed) {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(
+                message = noNearbyStations,
+                duration = SnackbarDuration.Short,
+                withDismissAction = true
+            )
+        }
+    }
 
     LaunchedEffect(userLocation) {
         if (!initialUserZoomDone && userLocation != null) {
@@ -260,6 +288,10 @@ fun MapContent(
                     initialUserZoomDone = true
                 }
             }
+        }
+
+        if (userLocation != null && lastSearchLocation == null) {
+            lastSearchLocation = userLocation
         }
     }
 
@@ -304,7 +336,6 @@ fun MapContent(
         }
     }
 
-
     LaunchedEffect(viewModel.lastUpdateLocation) {
         mapView.getMapAsync { map ->
             userLocation?.let { latLng ->
@@ -313,6 +344,31 @@ fun MapContent(
                     .zoom(16.0)
                     .build()
                 map.cameraPosition = cameraPosition
+            }
+
+            map.addOnCameraIdleListener {
+                currentCameraTarget = map.cameraPosition.target
+            }
+        }
+    }
+
+    LaunchedEffect(currentCameraTarget, lastSearchLocation, isSearchActive) {
+        val current = currentCameraTarget
+        val last = lastSearchLocation
+
+        if (current != null) {
+            if (last == null) {
+                lastSearchLocation = current
+                showSearchAreaButton = false
+            } else {
+                val results = FloatArray(1)
+                android.location.Location.distanceBetween(
+                    current.latitude, current.longitude,
+                    last.latitude, last.longitude,
+                    results
+                )
+                val distanceInMeters = results[0]
+                showSearchAreaButton = distanceInMeters > 500 && !isSearchActive
             }
         }
     }
@@ -323,9 +379,10 @@ fun MapContent(
         mapView.getMapAsync { map ->
             map.getStyle { style ->
                 if (viewModel.symbolManager == null) {
-                    viewModel.symbolManager = SymbolManager(mapView, map, style).apply {
+                    viewModel.symbolManager = ExtendedSymbolManager(mapView, map, style).apply {
                         iconAllowOverlap = true
                         textAllowOverlap = true
+                        applyZoomTextOpacity()
                     }
                 }
 
@@ -351,17 +408,13 @@ fun MapContent(
                                 slotsOk && bikesOk
                             } else true
 
-                            !(matchesType && matchesBicing)
+                            val isBus = station.type == TransportType.BUS.type
+                            !(matchesType && matchesBicing && isBus)
                         }
                     }
                     .forEach { id ->
                         viewModel.markerMap[id]?.remove()
                         viewModel.markerMap.remove(id)
-
-                        viewModel.symbolMap[id]?.let { symbol ->
-                            symbolManager.delete(symbol)
-                            viewModel.symbolMap.remove(id)
-                        }
                     }
 
                 viewModel.symbolMap.keys.toList()
@@ -369,7 +422,7 @@ fun MapContent(
                         val station = nearbyStations.firstOrNull { it.station_code == id }
                         station == null || run {
                             val matchesType = selectedFilters.any { filter ->
-                                filter.equals(TransportType.BICING.name, ignoreCase = true)
+                                filter.equals(TransportType.from(station.type).name, ignoreCase = true)
                             }
 
                             val matchesBicing = if (station.type == TransportType.BICING.type) {
@@ -384,7 +437,8 @@ fun MapContent(
                                 slotsOk && bikesOk
                             } else true
 
-                            !(matchesType && matchesBicing)
+                            val isNotBus = station.type != TransportType.BUS.type
+                            !(matchesType && matchesBicing && isNotBus)
                         }
                     }
                     .forEach { id ->
@@ -418,16 +472,21 @@ fun MapContent(
                         val drawableId = getDrawableIdByName(context, station.type)
                         val sizePx = getMarkerSize(station.type)
 
-                        if (station.type == TransportType.BICING.type) {
+                        if (station.type != TransportType.BUS.type) {
                             val existing = viewModel.symbolMap[station.station_code]
+                            val isBicing = station.type == TransportType.BICING.type
 
-                            val elec = station.electrical ?: 0
-                            val mech = station.mechanical ?: 0
-                            val slots = station.slots ?: 0
-                            val displayText = bicingTemplate.format(slots, elec, mech)
+                            val displayText = if (isBicing) {
+                                val elec = station.electrical ?: 0
+                                val mech = station.mechanical ?: 0
+                                val slots = station.slots ?: 0
+                                bicingTemplate.format(slots, elec, mech)
+                            } else {
+                                station.station_name
+                            }
 
                             if (existing == null) {
-                                val iconName = "bicing-icon"
+                                val iconName = "${station.type}-icon"
                                 if (style.getImage(iconName) == null) {
                                     val bitmap = getBitmapFromDrawable(context, drawableId, sizePx)
                                     style.addImage(iconName, bitmap)
@@ -461,9 +520,10 @@ fun MapContent(
                                         it.station_code == code
                                     }
                                     stationInfo?.let {
+                                        val transportType = TransportType.from(it.type)
                                         viewModel.selectNearbyStation(
                                             it,
-                                            ApiClient.from(TransportType.BICING)
+                                            ApiClient.from(transportType)
                                         )
 
                                         val cameraPosition = CameraPosition.Builder()
@@ -526,7 +586,9 @@ fun MapContent(
         Box(modifier = Modifier.fillMaxSize()) {
             AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
 
-            Column {
+            Column(
+                modifier = Modifier.statusBarsPadding().align(Alignment.TopCenter).fillMaxWidth()
+            ) {
                 Row {
                     SearchTopBar(
                         initialQuery = "",
@@ -535,8 +597,6 @@ fun MapContent(
                         onActiveChange = { active -> isSearchActive = active }
                     )
                 }
-
-                Spacer(modifier = Modifier.height(5.dp))
 
                 val iconMap = mapOf(
                     TransportType.METRO.type.capitalize() to R.drawable.metro,
@@ -582,24 +642,56 @@ fun MapContent(
                                     )
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
                                     containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                                 ),
                                 border = FilterChipDefaults.filterChipBorder(
-                                    borderColor = if (selectedFilters.contains(filter))
-                                        MaterialTheme.colorScheme.surfaceContainer
-                                    else
-                                        Color.Transparent,
-                                    selectedBorderColor = MaterialTheme.colorScheme.primary,
-                                    disabledBorderColor = Color.Transparent,
+                                    borderColor = Color.Black.copy(alpha=0.5f),
+                                    selectedBorderColor = Color.Black.copy(alpha=0.5f),
                                     borderWidth = 1.dp,
                                     enabled = true,
                                     selected = selectedFilters.contains(filter)
                                 ),
-                                modifier = Modifier.size(34.dp)
+                                modifier = Modifier
+                                    .size(34.dp)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                         }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AnimatedVisibility(
+                    visible = showSearchAreaButton,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut(),
+                    modifier = Modifier.zIndex(3f).align(Alignment.CenterHorizontally)
+                ) {
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            mapView.getMapAsync { map ->
+                                val target = map.cameraPosition.target
+                                lastSearchLocation = target
+                                showSearchAreaButton = false
+                                viewModel.updateNearbyStations(
+                                    latitude = target?.latitude,
+                                    longitude = target?.longitude
+                                )
+                            }
+                        },
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        elevation = FloatingActionButtonDefaults.elevation(6.dp),
+                        modifier = Modifier.height(36.dp),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.map_search_area),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
                     }
                 }
             }
@@ -630,14 +722,17 @@ fun MapContent(
 
             if (!isSearchActive) {
                 userLocation?.let { location ->
+                    val systemNavHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                    val appNavBarHeight = 80.dp // BottomNavigationBar
+                    val extraMargin = 16.dp
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(4.dp),
+                            .padding(end = 16.dp, bottom = systemNavHeight + appNavBarHeight + extraMargin),
                         contentAlignment = Alignment.BottomEnd
                     ) {
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                             horizontalAlignment = Alignment.End
                         ) {
                             CustomFloatingActionButton(
@@ -670,6 +765,22 @@ fun MapContent(
                         }
                     }
                 }
+            }
+
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 100.dp)
+                    .zIndex(2f)
+            ) { data ->
+                Snackbar(
+                    modifier = Modifier.padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    shape = RoundedCornerShape(12.dp),
+                    snackbarData = data
+                )
             }
         }
 
@@ -1379,4 +1490,24 @@ fun checkLocationPermission(context: Context): Boolean {
                 context,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
+}
+
+
+class ExtendedSymbolManager(
+    mapView: MapView,
+    mapLibreMap: MapLibreMap,
+    style: Style
+) : SymbolManager(mapView, mapLibreMap, style) {
+
+    fun applyZoomTextOpacity() {
+        layer.setProperties(
+            PropertyFactory.textOpacity(
+                Expression.step(
+                    Expression.zoom(),
+                    0f,
+                    Expression.stop(14.5f, 1f)
+                )
+            )
+        )
+    }
 }

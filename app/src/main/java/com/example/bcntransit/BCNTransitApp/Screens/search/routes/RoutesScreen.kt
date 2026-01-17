@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.Stairs
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
@@ -127,110 +128,116 @@ fun RoutesScreen(
                 topBar = {
                     CustomTopBar(
                         title = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(bottom = 16.dp, top = 16.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(drawableId),
-                                    contentDescription = null,
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(50.dp)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
+                            ListItem(
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                leadingContent = {
+                                    Icon(
+                                        painter = painterResource(drawableId),
+                                        contentDescription = null,
+                                        tint = Color.Unspecified,
+                                        modifier = Modifier.size(42.dp)
+                                    )
+                                },
+                                headlineContent = {
                                     Text(
                                         text = selectedStation!!.name,
-                                        style = MaterialTheme.typography.headlineSmall,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
+                                },
+                                supportingContent = {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
-                                            text = "(${selectedStation!!.code})  ·  ",
-                                            style = MaterialTheme.typography.labelMedium,
+                                            text = "(${selectedStation!!.code}) · ",
+                                            style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
+
                                         val alertText = if (selectedStation!!.has_alerts) stringResource(R.string.incidents) else stringResource(R.string.normal_service)
                                         val alertColor = if (selectedStation!!.has_alerts) colorResource(R.color.red) else colorResource(R.color.dark_green)
 
                                         Box(
                                             modifier = Modifier
-                                                .size(10.dp)
+                                                .size(8.dp)
                                                 .background(alertColor, shape = CircleShape)
                                         )
-                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
                                         Text(
-                                            alertText,
+                                            text = alertText,
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
                                     }
-                                }
-
-                                IconButton(
-                                    onClick = {
-                                        scope.launch {
-                                            if (isFavorite) {
-                                                try {
-                                                    isLoadingFavorite = true
-                                                    ApiClient.userApiService.deleteUserFavorite(
-                                                        selectedStation!!.transport_type,
-                                                        selectedStation!!.code
-                                                    )
-                                                    isFavorite = false
-                                                } catch (e: Exception) {
-                                                    e.printStackTrace()
-                                                } finally {
-                                                    isLoadingFavorite = false
-                                                }
-                                            } else {
-                                                try {
-                                                    isLoadingFavorite = true
-                                                    ApiClient.userApiService.addUserFavorite(
-                                                        favorite = FavoriteDto(
-                                                            TYPE = selectedStation!!.transport_type,
-                                                            LINE_CODE = selectedStation!!.line_code,
-                                                            LINE_NAME = selectedStation!!.line_name,
-                                                            LINE_NAME_WITH_EMOJI = selectedStation!!.line_name_with_emoji ?: "",
-                                                            STATION_CODE = selectedStation!!.code,
-                                                            STATION_NAME = selectedStation!!.name,
-                                                            STATION_GROUP_CODE = selectedStation!!.CODI_GRUP_ESTACIO.toString(),
-                                                            coordinates = listOf(
-                                                                selectedStation!!.latitude,
-                                                                selectedStation!!.longitude
+                                },
+                                trailingContent = {
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch {
+                                                if (isFavorite) {
+                                                    try {
+                                                        isLoadingFavorite = true
+                                                        ApiClient.userApiService.deleteUserFavorite(
+                                                            selectedStation!!.transport_type,
+                                                            selectedStation!!.code
+                                                        )
+                                                        isFavorite = false
+                                                    } catch (e: Exception) {
+                                                        e.printStackTrace()
+                                                    } finally {
+                                                        isLoadingFavorite = false
+                                                    }
+                                                } else {
+                                                    try {
+                                                        isLoadingFavorite = true
+                                                        ApiClient.userApiService.addUserFavorite(
+                                                            favorite = FavoriteDto(
+                                                                type = selectedStation!!.transport_type,
+                                                                line_code = selectedStation!!.line_code,
+                                                                line_name = selectedStation!!.line_name,
+                                                                line_name_with_emoji = selectedStation!!.line_name_with_emoji ?: "",
+                                                                station_code = selectedStation!!.code,
+                                                                station_name = selectedStation!!.name,
+                                                                station_group_code = selectedStation!!.CODI_GRUP_ESTACIO.toString(),
+                                                                coordinates = listOf(
+                                                                    selectedStation!!.latitude,
+                                                                    selectedStation!!.longitude
+                                                                )
                                                             )
                                                         )
-                                                    )
-                                                    isFavorite = true
-                                                } catch (e: Exception) {
-                                                    e.printStackTrace()
-                                                } finally {
-                                                    isLoadingFavorite = false
+                                                        isFavorite = true
+                                                    } catch (e: Exception) {
+                                                        e.printStackTrace()
+                                                    } finally {
+                                                        isLoadingFavorite = false
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                ) {
-                                    if (isLoadingFavorite) {
-                                        CircularProgressIndicator(color = colorResource(R.color.medium_red))
-                                    } else {
-                                        Icon(
-                                            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                                            contentDescription = "Favorito",
-                                            tint = colorResource(R.color.red)
-                                        )
+                                    ) {
+                                        if (isLoadingFavorite) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                strokeWidth = 2.dp,
+                                                color = colorResource(R.color.medium_red)
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                                                contentDescription = "Favorito",
+                                                tint = colorResource(R.color.red),
+                                                modifier = Modifier.size(28.dp)
+                                            )
+                                        }
                                     }
                                 }
-                            }
+                            )
                         },
                         onBackClick = onBackClick,
-                        height = 80.dp
+                        height = 100.dp
                     )
                 }
             ) { padding ->

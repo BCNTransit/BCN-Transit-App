@@ -37,7 +37,6 @@ class StationListViewModel(
                 val line = apiService.getLines().first { it.code == lineCode }
                 val stations = apiService.getStationsByLine(lineCode)
 
-                // Direccion por defecto
                 val defaultDirection = "${line.origin} → ${line.destination}"
 
                 _uiState.value = StationListUiState(

@@ -52,12 +52,12 @@ class WidgetConfigurationActivity : ComponentActivity() {
         // Guardamos la configuración
         val prefs = context.getSharedPreferences("widget_prefs", MODE_PRIVATE)
         prefs.edit().apply {
-            putString("widget_${appWidgetId}_favorite_id", favorite.STATION_CODE)
-            putString("widget_${appWidgetId}_station_name", favorite.STATION_NAME)
-            putString("widget_${appWidgetId}_station_code", favorite.STATION_CODE)
-            putString("widget_${appWidgetId}_line_name", favorite.LINE_NAME)
-            putString("widget_${appWidgetId}_line_code", favorite.LINE_CODE)
-            putString("widget_${appWidgetId}_type", favorite.TYPE)
+            putString("widget_${appWidgetId}_favorite_id", favorite.station_code)
+            putString("widget_${appWidgetId}_station_name", favorite.station_name)
+            putString("widget_${appWidgetId}_station_code", favorite.station_code)
+            putString("widget_${appWidgetId}_line_name", favorite.line_name)
+            putString("widget_${appWidgetId}_line_code", favorite.line_code)
+            putString("widget_${appWidgetId}_type", favorite.type)
             apply()
         }
 

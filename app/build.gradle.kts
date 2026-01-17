@@ -25,10 +25,13 @@ android {
         applicationId = "com.bcntransit.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.0-Alpha"
         buildConfigField("String", "API_KEY", "\"$bcnApiKey\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    androidResources {
+        localeFilters += listOf("en", "es", "ca")
     }
 
     buildTypes {
@@ -61,6 +64,7 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
     
     implementation("org.maplibre.gl:android-sdk:11.5.0")
     implementation("org.maplibre.gl:android-plugin-annotation-v9:3.0.0")

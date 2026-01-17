@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.PedalBike
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -102,30 +103,33 @@ fun BicingStationScreen(
                 topBar = {
                     CustomTopBar(
                         title = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(vertical = 16.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.bicing),
-                                    contentDescription = null,
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(50.dp)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
+                            ListItem(
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
 
-                                Column(modifier = Modifier.weight(1f)) {
+                                leadingContent = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.bicing),
+                                        contentDescription = null,
+                                        tint = Color.Unspecified,
+                                        modifier = Modifier.size(42.dp)
+                                    )
+                                },
+
+                                headlineContent = {
                                     Text(
                                         text = "${selectedStation.streetName}, ${selectedStation.streetNumber}",
-                                        style = MaterialTheme.typography.headlineSmall,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
+                                },
 
+                                supportingContent = {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
-                                            text = "(${selectedStation.id})  ·  ",
-                                            style = MaterialTheme.typography.labelMedium,
+                                            text = "(${selectedStation.id}) · ",
+                                            style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
 
@@ -135,66 +139,76 @@ fun BicingStationScreen(
 
                                         Box(
                                             modifier = Modifier
-                                                .size(10.dp)
+                                                .size(8.dp)
                                                 .background(alertColor, shape = CircleShape)
                                         )
-                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+
                                         Text(
-                                            alertText,
+                                            text = alertText,
                                             style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     }
-                                }
+                                },
 
-                                IconButton(
-                                    onClick = {
-                                        scope.launch {
-                                            try {
-                                                isLoadingFavorite = true
-                                                if (isFavorite) {
-                                                    ApiClient.userApiService.deleteUserFavorite(
-                                                        TransportType.BICING.type,
-                                                        selectedStation.id
-                                                    )
-                                                    isFavorite = false
-                                                } else {
-                                                    ApiClient.userApiService.addUserFavorite(
-                                                        favorite = FavoriteDto(
-                                                            TYPE = TransportType.BICING.type,
-                                                            LINE_CODE = "BICING",
-                                                            LINE_NAME = "Bicing",
-                                                            LINE_NAME_WITH_EMOJI = "🚲 Bicing",
-                                                            STATION_CODE = selectedStation.id,
-                                                            STATION_NAME = "${selectedStation.streetName}, ${selectedStation.streetNumber}",
-                                                            STATION_GROUP_CODE = "",
-                                                            coordinates = listOf(selectedStation.latitude, selectedStation.longitude)
+                                trailingContent = {
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch {
+                                                try {
+                                                    isLoadingFavorite = true
+                                                    if (isFavorite) {
+                                                        ApiClient.userApiService.deleteUserFavorite(
+                                                            TransportType.BICING.type,
+                                                            selectedStation.id
                                                         )
-                                                    )
-                                                    isFavorite = true
+                                                        isFavorite = false
+                                                    } else {
+                                                        ApiClient.userApiService.addUserFavorite(
+                                                            favorite = FavoriteDto(
+                                                                type = TransportType.BICING.type,
+                                                                line_code = "BICING",
+                                                                line_name = "Bicing",
+                                                                line_name_with_emoji = "🚲 Bicing",
+                                                                station_code = selectedStation.id,
+                                                                station_name = "${selectedStation.streetName}, ${selectedStation.streetNumber}",
+                                                                station_group_code = "",
+                                                                coordinates = listOf(selectedStation.latitude, selectedStation.longitude)
+                                                            )
+                                                        )
+                                                        isFavorite = true
+                                                    }
+                                                } catch (e: Exception) {
+                                                    e.printStackTrace()
+                                                } finally {
+                                                    isLoadingFavorite = false
                                                 }
-                                            } catch (e: Exception) {
-                                                e.printStackTrace()
-                                            } finally {
-                                                isLoadingFavorite = false
                                             }
                                         }
-                                    }
-                                ) {
-                                    if (isLoadingFavorite) {
-                                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = colorResource(R.color.medium_red))
-                                    } else {
-                                        Icon(
-                                            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                                            contentDescription = "Favorito",
-                                            tint = colorResource(R.color.red)
-                                        )
+                                    ) {
+                                        if (isLoadingFavorite) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                color = colorResource(R.color.medium_red),
+                                                strokeWidth = 2.dp
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                                                contentDescription = "Favorito",
+                                                tint = colorResource(R.color.red),
+                                                modifier = Modifier.size(28.dp)
+                                            )
+                                        }
                                     }
                                 }
-                            }
+                            )
                         },
                         onBackClick = onBackClick,
-                        height = 80.dp
+                        height = 100.dp
                     )
                 }
             ) { padding ->

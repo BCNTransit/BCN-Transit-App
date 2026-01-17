@@ -116,12 +116,15 @@ class MapViewModel(private val context: Context) : ViewModel() {
         }
     }
 
-    fun updateNearbyStations() {
+    fun updateNearbyStations(latitude: Double? = null, longitude: Double? = null) {
         val loc = userLocation ?: return
+        val lat = latitude ?: loc.latitude
+        val lon = longitude ?: loc.longitude
+
         isLoadingNearbyStations = true
         viewModelScope.launch {
             try {
-                nearbyStations = getNearbyStations(loc.latitude, loc.longitude, selectedDistance)
+                nearbyStations = getNearbyStations(lat, lon, selectedDistance)
             } catch (e: Exception) {
                 e.printStackTrace()
                 nearbyStations = emptyList()

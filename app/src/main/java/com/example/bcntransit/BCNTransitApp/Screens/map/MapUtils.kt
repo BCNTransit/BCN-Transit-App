@@ -12,6 +12,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import com.bcntransit.app.api.ApiClient
+import com.bcntransit.app.data.enums.TransportType
 import com.bcntransit.app.model.transport.NearbyStation
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -66,11 +67,9 @@ fun getDrawableIdByName(context: Context, transportType: String): Int {
 }
 
 fun getMarkerIcon(context: Context, drawableRes: Int, sizePx: Int = 80): Icon {
-    // Cargar el drawable
     val drawable: Drawable = ContextCompat.getDrawable(context, drawableRes)
         ?: throw IllegalArgumentException("Drawable not found")
 
-    // Convertir a Bitmap
     val bitmap: Bitmap = if (drawable is BitmapDrawable) {
         drawable.bitmap
     } else {
@@ -81,25 +80,21 @@ fun getMarkerIcon(context: Context, drawableRes: Int, sizePx: Int = 80): Icon {
         bmp
     }
 
-    // Crear el Icon para MapLibre
     return IconFactory.getInstance(context).fromBitmap(bitmap)
 }
 
-// Cantidad de desplazamiento en grados
-// Positivo en latitude → mueve hacia el norte
-// Positivo en longitude → mueve hacia el este
 fun LatLng.withOffset(latOffset: Double = 0.0, lngOffset: Double = 0.0): LatLng {
     return LatLng(this.latitude + latOffset, this.longitude + lngOffset)
 }
 
 fun getMarkerSize(type: String): Int =
     when (type.lowercase()) {
-        "metro" -> 90
-        "bus" -> 40
-        "bicing" -> 60
-        "tram" -> 80
-        "rodalies" -> 65
-        "fgc" -> 60
+        TransportType.METRO.type -> 90
+        TransportType.BUS.type -> 40
+        TransportType.BICING.type -> 60
+        TransportType.TRAM.type -> 80
+        TransportType.RODALIES.type -> 65
+        TransportType.FGC.type -> 60
         else -> 50
     }
 
@@ -124,46 +119,6 @@ fun rememberMapViewWithLifecycle(context: Context): MapView {
     return mapView
 }
 
-fun configureMapStyle(
-    context: Context,
-    map: MapLibreMap,
-    enableLocationComponent: Boolean = false,
-    scrollEnabled: Boolean = true,
-    zoomEnabled: Boolean = true,
-    rotateEnabled: Boolean = false,
-    tiltEnabled: Boolean = false,
-    onStyleLoaded: (Style) -> Unit = {}
-) {
-    map.setStyle(
-        Style.Builder()
-            .fromUri("https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json")
-    ) { style ->
-        if (enableLocationComponent && hasLocationPermission(context)) {
-            val locationComponent = map.locationComponent
-            val options = LocationComponentActivationOptions
-                .builder(context, style)
-                .useDefaultLocationEngine(true)
-                .build()
-            locationComponent.activateLocationComponent(options)
-            locationComponent.isLocationComponentEnabled = true
-            locationComponent.cameraMode = CameraMode.TRACKING
-            locationComponent.renderMode = RenderMode.COMPASS
-        }
-
-        map.uiSettings.apply {
-            isScrollGesturesEnabled = scrollEnabled
-            isZoomGesturesEnabled = zoomEnabled
-            isRotateGesturesEnabled = rotateEnabled
-            isTiltGesturesEnabled = tiltEnabled
-        }
-
-        onStyleLoaded(style)
-    }
-}
-
-/**
- * Añade un marker de estación al mapa y centra la cámara
- */
 fun addMarker(
     context: Context,
     map: MapLibreMap,

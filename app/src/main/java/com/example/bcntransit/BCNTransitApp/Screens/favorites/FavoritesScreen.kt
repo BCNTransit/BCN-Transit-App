@@ -56,6 +56,7 @@ fun FavoritesScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             CustomTopBar(
                 title = {
@@ -84,8 +85,7 @@ fun FavoritesScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(top = padding.calculateTopPadding())
         ) {
             when {
                 loading -> {
@@ -132,11 +132,15 @@ fun FavoritesScreen(
                         )
                     }
                 }
-                // --- ESTADO NORMAL: LISTA CON DATOS ---
                 else -> {
                     LazyColumn(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            top = 8.dp,
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = padding.calculateBottomPadding() + 16.dp
+                        )
                     ) {
                         item {
                             Text(
@@ -147,7 +151,7 @@ fun FavoritesScreen(
                             )
                         }
 
-                        val groupedFavorites = favorites.groupBy { it.TYPE }
+                        val groupedFavorites = favorites.groupBy { it.type }
 
                         groupedFavorites.forEach { (type, favoritesOfType) ->
                             item {
@@ -162,7 +166,7 @@ fun FavoritesScreen(
 
                             itemsIndexed(
                                 items = favoritesOfType,
-                                key = { _, fav -> "${fav.TYPE}_${fav.STATION_CODE}" }
+                                key = { _, fav -> "${fav.type}_${fav.station_code}" }
                             ) { _, fav ->
                                 FavoriteItem(
                                     fav = fav,
@@ -173,8 +177,8 @@ fun FavoritesScreen(
                                                 loading = true
 
                                                 val deleted = ApiClient.userApiService.deleteUserFavorite(
-                                                    fav.TYPE,
-                                                    fav.STATION_CODE
+                                                    fav.type,
+                                                    fav.station_code
                                                 )
 
                                                 if (deleted) {

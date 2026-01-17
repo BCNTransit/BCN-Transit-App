@@ -148,4 +148,17 @@
     <string name="favorites_empty_title">Encara no tens favorits</string>
     <string name="favorites_empty_body">Cerca les teves línies o parades freqüents i prem l\'estrella per desar-les aquí.</string>
     <string name="routes_line_details_not_available">Detalls no disponibles per a la línia: %1$s</string>
+    <string name="onboarding_title_1">Tot BCN Unificat</string>
+    <string name="onboarding_desc_1">Consulta Metro, TMB, AMB, Rodalies, FGC i Tram en una sola aplicació.</string>
+
+    <string name="onboarding_title_2">Temps Real i Mapes</string>
+    <string name="onboarding_desc_2">Mapes vectorials ràpids amb temps d\'arribada precisos perquè no esperis.</string>
+
+    <string name="onboarding_title_3">Bicing i Accessibilitat</string>
+    <string name="onboarding_desc_3">Consulta disponibilitat de bicicletes i l\'estat dels ascensors a les estacions.</string>
+
+    <string name="onboarding_title_4">Troba el que tens a prop</string>
+    <string name="onboarding_desc_4">Activa la teva ubicació per detectar automàticament les parades al teu voltant.</string>
+    <string name="map_no_nearby_stations">No s\'han trobat estacions properes</string>
+    <string name="map_search_area">Cerca en aquesta zona</string>
 </resources>

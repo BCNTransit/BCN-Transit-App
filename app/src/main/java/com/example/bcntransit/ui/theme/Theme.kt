@@ -19,7 +19,6 @@ enum class AppThemeMode {
     LIGHT, DARK, SYSTEM
 }
 
-// 1. Mapeamos los colores oscuros
 private val DarkColorScheme = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
@@ -27,10 +26,8 @@ private val DarkColorScheme = darkColorScheme(
     background = md_theme_dark_background,
     surface = md_theme_dark_surface,
     onSurface = md_theme_dark_onSurface,
-    // ... define secondary, tertiary, error, etc. si los tienes
 )
 
-// 2. Mapeamos los colores claros
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,

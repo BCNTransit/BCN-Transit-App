@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Route
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,7 +52,7 @@ fun LineListScreen(
                 title = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val drawableId = remember(transportType) {
                             context.resources.getIdentifier(transportType.type, "drawable", context.packageName)
@@ -61,10 +63,10 @@ fun LineListScreen(
                             tint = Color.Unspecified,
                             modifier = Modifier.size(42.dp)
                         )
-                        Spacer(Modifier.width(16.dp))
-                        Text(stringResource(R.string.menu_lines), style = MaterialTheme.typography.titleLarge)
+
+                        Text(stringResource(R.string.menu_lines), style = MaterialTheme.typography.titleMedium)
                     }
-                },
+                }
             )
         }
     ) { paddingValues ->
